@@ -64,7 +64,7 @@ func HoverColorAnimation(
 }
 
 func (h *HoverColorAnimationWidget) Reset() {
-	d := h.AnimatorWidget.GetCustomData()
+	d := h.AnimatorWidget.CustomData()
 	if d == nil {
 		h.AnimatorWidget.SetCustomData(&animationData{
 			m: &sync.Mutex{},
@@ -84,7 +84,7 @@ func (h *HoverColorAnimationWidget) Reset() {
 }
 
 func (h *HoverColorAnimationWidget) Advance(procentDelta float32) bool {
-	d := h.AnimatorWidget.GetCustomData()
+	d := h.AnimatorWidget.CustomData()
 	if d == nil {
 		return true
 	}
@@ -108,12 +108,12 @@ func (h *HoverColorAnimationWidget) Init() {
 }
 
 func (h *HoverColorAnimationWidget) Build() {
-	if h.GetState().shouldInit {
+	if h.getState().shouldInit {
 		h.Init()
-		h.GetState().shouldInit = false
+		h.getState().shouldInit = false
 	}
 
-	d := h.AnimatorWidget.GetCustomData()
+	d := h.AnimatorWidget.CustomData()
 	data, ok := d.(*animationData)
 	if !ok {
 		logger.Fatalf("expected data type *animationData, got %T", d)
@@ -137,7 +137,7 @@ func (h *HoverColorAnimationWidget) Build() {
 	procentage := data.procentage
 	data.m.Unlock()
 
-	state := h.AnimatorWidget.GetState()
+	state := h.AnimatorWidget.getState()
 
 	if !isHovered && state.IsRunning() {
 		procentage = 1 - procentage

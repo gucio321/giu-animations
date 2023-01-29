@@ -3,33 +3,10 @@ package animations
 
 import (
 	"github.com/gucio321/giu-animations/internal/logger"
-	"sync"
 	"time"
 
 	"github.com/AllenDang/giu"
 )
-
-func (t *AnimatorWidget) GetState() *animatorState {
-	if s := giu.Context.GetState(t.id); s != nil {
-		state, ok := s.(*animatorState)
-		if !ok {
-			logger.Fatalf("error asserting type of ttransition state: got %T", s)
-		}
-
-		return state
-	}
-
-	giu.Context.SetState(t.id, t.newState())
-
-	return t.GetState()
-}
-
-func (t *AnimatorWidget) newState() *animatorState {
-	return &animatorState{
-		shouldInit: true,
-		m:          &sync.Mutex{},
-	}
-}
 
 type AnimatorWidget struct {
 	id                   string
@@ -50,7 +27,7 @@ func Animator(a Animation, renderer1, renderer2 func(this Animation)) *AnimatorW
 
 func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 	t.Animation.Reset()
-	state := t.GetState()
+	state := t.getState()
 
 	if state.isRunning {
 		logger.Fatal("AnimatorWidget: StartTransition called, but transition is already running")
@@ -84,22 +61,8 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 	}()
 }
 
-func (t *AnimatorWidget) GetCustomData() any {
-	state := t.GetState()
-	state.m.Lock()
-	defer state.m.Unlock()
-	return state.customData
-}
-
-func (t *AnimatorWidget) SetCustomData(d any) {
-	state := t.GetState()
-	state.m.Lock()
-	state.customData = d
-	state.m.Unlock()
-}
-
 func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
-	state := t.GetState()
+	state := t.getState()
 
 	if !state.IsRunning() {
 		if !state.currentLayout {
@@ -112,10 +75,4 @@ func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
 	}
 
 	return false
-}
-
-func (s *animatorState) IsRunning() bool {
-	s.m.Lock()
-	defer s.m.Unlock()
-	return s.isRunning
 }

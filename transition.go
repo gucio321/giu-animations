@@ -21,7 +21,7 @@ func (t *TransitionWidget) Start(d time.Duration, fps int) {
 }
 
 func (t *TransitionWidget) Advance(procentDelta float32) bool {
-	state := t.a.GetState()
+	state := t.a.getState()
 	// it means the current layou is layout1, so increasing procentage
 	if state.currentLayout {
 		t.a.SetCustomData(procentDelta)
@@ -33,7 +33,7 @@ func (t *TransitionWidget) Advance(procentDelta float32) bool {
 }
 
 func (t *TransitionWidget) Reset() {
-	state := t.a.GetState()
+	state := t.a.getState()
 	if state.currentLayout {
 		t.a.SetCustomData(float32(0))
 	} else {
@@ -50,7 +50,7 @@ func (t *TransitionWidget) Build() {
 		return
 	}
 
-	d := t.a.GetCustomData()
+	d := t.a.CustomData()
 	layout1ProcentageAlpha, ok := d.(float32)
 	if !ok {
 		logger.Fatal("invalid custom data type: wanted float32 got %t", d)
