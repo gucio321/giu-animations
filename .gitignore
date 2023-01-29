@@ -1,0 +1,36 @@
+.idea
+.vs
+.vscode
+
+# vim cache files
+*.swp
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+coverage.txt
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+.DS_Store
+
+# binary on *nix
+# --nothing here for now
+
+# goland binary when build dir is the repo dir
+go_build*
+
+# build directory create dby Makefile
+build/
+
+# libreoffice lock files
+.~*\#
