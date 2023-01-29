@@ -66,3 +66,19 @@ func (t *TransitionWidget) Build() {
 	t.a.renderer2(t)
 	imgui.PopStyleVar()
 }
+
+func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
+	state := t.getState()
+
+	if !state.IsRunning() {
+		if !state.currentLayout {
+			t.renderer1(a)
+		} else {
+			t.renderer2(a)
+		}
+
+		return true
+	}
+
+	return false
+}

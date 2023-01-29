@@ -8,25 +8,54 @@ import (
 	"github.com/AllenDang/giu"
 )
 
+const (
+	DefaultFPS      = 60
+	DefaultDuration = time.Second / 4
+)
+
+// AnimatorWidget is a manager for animation.
+// It is a giu.Widget, but you should reather store it in a variable
+// in order to be able to call Start.
 type AnimatorWidget struct {
-	id                   string
-	renderer1, renderer2 func(this Animation)
-	Animation
+	id string
+
+	duration time.Duration
+	fps      int
+
+	a Animation
 }
 
-func Animator(a Animation, renderer1, renderer2 func(this Animation)) *AnimatorWidget {
+// Animator creates a new AnimatorWidget.
+func Animator(a Animation) *AnimatorWidget {
 	result := &AnimatorWidget{
-		id:        giu.GenAutoID("Animation"),
-		renderer1: renderer1,
-		renderer2: renderer2,
-		Animation: a,
+		id:       giu.GenAutoID("Animation"),
+		a:        a,
+		duration: DefaultDuration,
+		fps:      DefaultFPS,
 	}
 
 	return result
 }
 
+// FPS allows to specify FPS value.
+// CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
+func (t *AnimatorWidget) FPS(fps int) *AnimatorWidget {
+	t.fps = fps
+
+	return t
+}
+
+// Duration allows to specify duration value.
+// CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
+func (t *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
+	t.duration = duration
+
+	return t
+}
+
+// Start starts the animation.
 func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
-	t.Animation.Reset()
+	t.a.Reset()
 	state := t.getState()
 
 	if state.isRunning {
@@ -51,7 +80,7 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 
 			procentDelta := float32(state.elapsed) / float32(state.duration)
 
-			if !t.Advance(procentDelta) {
+			if !t.a.Advance(procentDelta) {
 				return
 			}
 
@@ -61,18 +90,7 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 	}()
 }
 
-func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
-	state := t.getState()
-
-	if !state.IsRunning() {
-		if !state.currentLayout {
-			t.renderer1(a)
-		} else {
-			t.renderer2(a)
-		}
-
-		return true
-	}
-
-	return false
+// Build implements giu.Widget
+func (t *AnimatorWidget) Build() {
+	t.a.Build()
 }
