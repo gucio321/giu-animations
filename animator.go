@@ -92,5 +92,13 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 
 // Build implements giu.Widget
 func (t *AnimatorWidget) Build() {
+	if t.shouldInit() {
+		t.a.Init()
+		s := t.getState()
+		s.m.Lock()
+		s.shouldInit = false
+		s.m.Unlock()
+	}
+
 	t.a.Build()
 }

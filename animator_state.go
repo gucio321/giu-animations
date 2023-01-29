@@ -85,8 +85,17 @@ func (t *AnimatorWidget) SetCustomData(d any) {
 }
 
 // IsRunning returns true if the animation is already running.
-func (s *animatorState) IsRunning() bool {
+func (a *AnimatorWidget) IsRunning() bool {
+	s := a.getState()
 	s.m.Lock()
 	defer s.m.Unlock()
 	return s.isRunning
+}
+
+func (a *AnimatorWidget) shouldInit() bool {
+	s := a.getState()
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	return s.shouldInit
 }
