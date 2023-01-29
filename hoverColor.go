@@ -27,7 +27,7 @@ type animationData struct {
 var _ Animation = &HoverColorAnimationWidget{}
 
 type HoverColorAnimationWidget struct {
-	*animationWidget
+	*AnimatorWidget
 	giu.Widget
 	hoveredColor,
 	normalColor func() color.RGBA
@@ -66,15 +66,15 @@ func HoverColorAnimation(
 		normalID:     imgui.StyleColorID(normalID),
 	}
 
-	result.animationWidget = newAnimation(result, nil, nil)
+	result.AnimatorWidget = Animator(result, nil, nil)
 
 	return result
 }
 
 func (h *HoverColorAnimationWidget) Reset() {
-	d := h.animationWidget.GetCustomData()
+	d := h.AnimatorWidget.GetCustomData()
 	if d == nil {
-		h.animationWidget.SetCustomData(&animationData{
+		h.AnimatorWidget.SetCustomData(&animationData{
 			m: &sync.Mutex{},
 		})
 
@@ -92,7 +92,7 @@ func (h *HoverColorAnimationWidget) Reset() {
 }
 
 func (h *HoverColorAnimationWidget) Advance(procentDelta float32) bool {
-	d := h.animationWidget.GetCustomData()
+	d := h.AnimatorWidget.GetCustomData()
 	if d == nil {
 		return true
 	}
@@ -110,7 +110,7 @@ func (h *HoverColorAnimationWidget) Advance(procentDelta float32) bool {
 }
 
 func (h *HoverColorAnimationWidget) Init() {
-	h.animationWidget.SetCustomData(&animationData{
+	h.AnimatorWidget.SetCustomData(&animationData{
 		m: &sync.Mutex{},
 	})
 }
@@ -121,7 +121,7 @@ func (h *HoverColorAnimationWidget) Build() {
 		h.GetState().shouldInit = false
 	}
 
-	d := h.animationWidget.GetCustomData()
+	d := h.AnimatorWidget.GetCustomData()
 	data, ok := d.(*animationData)
 	if !ok {
 		logger.Fatalf("expected data type *animationData, got %T", d)
@@ -145,7 +145,7 @@ func (h *HoverColorAnimationWidget) Build() {
 	procentage := data.procentage
 	data.m.Unlock()
 
-	state := h.animationWidget.GetState()
+	state := h.AnimatorWidget.GetState()
 
 	if !isHovered && state.IsRunning() {
 		procentage = 1 - procentage

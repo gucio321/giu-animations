@@ -1,10 +1,11 @@
 package main
 
 import (
+	"image/color"
 	"time"
 
 	"github.com/AllenDang/giu"
-	"github.com/TheGreaterHeptavirate/motorola/pkg/app/animations"
+	animations "github.com/gucio321/giu-animations"
 	"golang.org/x/image/colornames"
 )
 
@@ -17,7 +18,15 @@ func loop() {
 					giu.Button("start transition").OnClick(func() {
 						this.Start(time.Second, 60)
 					}),
-					60, time.Second, colornames.Red,
+					60, time.Second,
+					func() color.RGBA {
+						return colornames.Red
+					},
+					func() color.RGBA {
+						return colornames.Blue
+					},
+					giu.StyleColorButtonHovered,
+					giu.StyleColorButton,
 				),
 			)
 		},

@@ -19,36 +19,24 @@ import (
 
 // ANimation is an interface implemented by each animation.
 type Animation interface {
-	Advance(procentageDelta float32) (shouldContinue bool)
-	Start(duration time.Duration, fps int)
-	Reset()
+	// Init is called once, immediately on start.
 	Init()
+	// Reset is called whenever needs to restart animation.
+	Reset()
+	// Start is called along with Animator.Start
+	Start(duration time.Duration, fps int)
+	// Advance is called every frame
+	Advance(procentageDelta float32) (shouldContinue bool)
 	giu.Widget
 }
 
-type transitionState struct {
-	isRunning     bool
-	currentLayout bool
-	elapsed       time.Duration
-	duration      time.Duration
-	customData    any
-	shouldInit    bool
-	m             *sync.Mutex
-}
-
-func (s *transitionState) IsRunning() bool {
-	s.m.Lock()
-	defer s.m.Unlock()
-	return s.isRunning
-}
-
-func (s *transitionState) Dispose() {
+func (s *animatorState) Dispose() {
 	// noop
 }
 
-func (t *animationWidget) GetState() *transitionState {
+func (t *AnimatorWidget) GetState() *animatorState {
 	if s := giu.Context.GetState(t.id); s != nil {
-		state, ok := s.(*transitionState)
+		state, ok := s.(*animatorState)
 		if !ok {
 			logger.Fatalf("error asserting type of ttransition state: got %T", s)
 		}
@@ -61,21 +49,21 @@ func (t *animationWidget) GetState() *transitionState {
 	return t.GetState()
 }
 
-func (t *animationWidget) newState() *transitionState {
-	return &transitionState{
+func (t *AnimatorWidget) newState() *animatorState {
+	return &animatorState{
 		shouldInit: true,
 		m:          &sync.Mutex{},
 	}
 }
 
-type animationWidget struct {
+type AnimatorWidget struct {
 	id                   string
 	renderer1, renderer2 func(this Animation)
 	Animation
 }
 
-func newAnimation(a Animation, renderer1, renderer2 func(this Animation)) *animationWidget {
-	result := &animationWidget{
+func Animator(a Animation, renderer1, renderer2 func(this Animation)) *AnimatorWidget {
+	result := &AnimatorWidget{
 		id:        giu.GenAutoID("Animation"),
 		renderer1: renderer1,
 		renderer2: renderer2,
@@ -85,12 +73,12 @@ func newAnimation(a Animation, renderer1, renderer2 func(this Animation)) *anima
 	return result
 }
 
-func (t *animationWidget) Start(duration time.Duration, fps int) {
+func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 	t.Animation.Reset()
 	state := t.GetState()
 
 	if state.isRunning {
-		logger.Fatal("animationWidget: StartTransition called, but transition is already running")
+		logger.Fatal("AnimatorWidget: StartTransition called, but transition is already running")
 	}
 
 	state.isRunning = true
@@ -121,21 +109,21 @@ func (t *animationWidget) Start(duration time.Duration, fps int) {
 	}()
 }
 
-func (t *animationWidget) GetCustomData() any {
+func (t *AnimatorWidget) GetCustomData() any {
 	state := t.GetState()
 	state.m.Lock()
 	defer state.m.Unlock()
 	return state.customData
 }
 
-func (t *animationWidget) SetCustomData(d any) {
+func (t *AnimatorWidget) SetCustomData(d any) {
 	state := t.GetState()
 	state.m.Lock()
 	state.customData = d
 	state.m.Unlock()
 }
 
-func (t *animationWidget) BuildNormal(a Animation) (proceeded bool) {
+func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
 	state := t.GetState()
 
 	if !state.IsRunning() {
@@ -149,4 +137,10 @@ func (t *animationWidget) BuildNormal(a Animation) (proceeded bool) {
 	}
 
 	return false
+}
+
+func (s *animatorState) IsRunning() bool {
+	s.m.Lock()
+	defer s.m.Unlock()
+	return s.isRunning
 }

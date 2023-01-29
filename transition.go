@@ -15,12 +15,12 @@ import (
 )
 
 type TransitionWidget struct {
-	a *animationWidget
+	a *AnimatorWidget
 }
 
 func Transition(renderer1, renderer2 func(Animation)) *TransitionWidget {
 	result := &TransitionWidget{}
-	result.a = newAnimation(result, renderer1, renderer2)
+	result.a = Animator(result, renderer1, renderer2)
 	return result
 }
 
@@ -64,7 +64,7 @@ func (t *TransitionWidget) Build() {
 		logger.Fatal("invalid custom data type: wanted float32 got %t", d)
 	}
 	if layout1ProcentageAlpha > 1 {
-		logger.Fatalf("animationWidget: procentage alpha is %v (should be in range 0-1)", layout1ProcentageAlpha)
+		logger.Fatalf("AnimatorWidget: procentage alpha is %v (should be in range 0-1)", layout1ProcentageAlpha)
 	}
 
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, layout1ProcentageAlpha)
