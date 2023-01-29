@@ -3,7 +3,11 @@ package animations
 import (
 	"sync"
 	"time"
+
+	"github.com/AllenDang/giu"
 )
+
+var _ giu.Disposable = &animatorState{}
 
 type animatorState struct {
 	isRunning     bool
@@ -13,4 +17,8 @@ type animatorState struct {
 	customData    any
 	shouldInit    bool
 	m             *sync.Mutex
+}
+
+func (s *animatorState) Dispose() {
+	// noop
 }
