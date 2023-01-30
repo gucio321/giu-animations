@@ -7,7 +7,7 @@ type Animation interface {
 	// Reset is called whenever needs to restart animation.
 	Reset()
 	// Advance is called every frame
-	Advance(procentageDelta float32) (shouldContinue bool)
+	//Advance(procentageDelta float32) (shouldContinue bool)
 
 	// BuildNormal is called every frame when animation is not running
 	BuildNormal()

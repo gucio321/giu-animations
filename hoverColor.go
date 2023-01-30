@@ -9,7 +9,6 @@ import (
 )
 
 type hoverColorAnimationState struct {
-	procentage  float32
 	isHovered   bool
 	shouldStart bool
 	m           *sync.Mutex
@@ -62,41 +61,8 @@ func HoverColor(
 }
 
 func (h *HoverColorAnimation) Reset() {
-	d := h.AnimatorWidget.CustomData()
-	if d == nil {
-		h.AnimatorWidget.SetCustomData(&hoverColorAnimationState{
-			m: &sync.Mutex{},
-		})
-
-		return
-	}
-
-	currentData, ok := d.(*hoverColorAnimationState)
-	if !ok {
-		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
-	}
-
-	currentData.m.Lock()
-	currentData.procentage = 0
-	currentData.m.Unlock()
-}
-
-func (h *HoverColorAnimation) Advance(procentDelta float32) bool {
-	d := h.AnimatorWidget.CustomData()
-	if d == nil {
-		return true
-	}
-
-	data, ok := d.(*hoverColorAnimationState)
-	if !ok {
-		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
-	}
-
-	data.m.Lock()
-	data.procentage = procentDelta
-	data.m.Unlock()
-
-	return true
+	// TODO
+	//currentData := h.getState()
 }
 
 func (h *HoverColorAnimation) Init() {
@@ -186,5 +152,7 @@ func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
 }
 
 func (a *HoverColorAnimation) newState() *hoverColorAnimationState {
-	return &hoverColorAnimationState{}
+	return &hoverColorAnimationState{
+		m: &sync.Mutex{},
+	}
 }

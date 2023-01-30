@@ -78,12 +78,6 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 				return
 			}
 
-			procentDelta := float32(state.elapsed) / float32(state.duration)
-
-			if !t.a.Advance(procentDelta) {
-				return
-			}
-
 			giu.Update()
 			state.elapsed += tickDuration
 		}
