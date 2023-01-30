@@ -1,5 +1,3 @@
-# STATUS: WIP
-
 # GIU ANIMATIONS
 
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
