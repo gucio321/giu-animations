@@ -6,32 +6,36 @@ import (
 	"github.com/gucio321/giu-animations/internal/logger"
 	"image/color"
 	"sync"
-	"time"
 )
 
-type animationData struct {
+type hoverColorAnimationState struct {
 	procentage  float32
 	isHovered   bool
 	shouldStart bool
 	m           *sync.Mutex
 }
 
-var _ Animation = &HoverColorAnimationWidget{}
+func (s *hoverColorAnimationState) Dispose() {
+	// noop
+}
 
-type HoverColorAnimationWidget struct {
-	*AnimatorWidget
+var _ Animation = &HoverColorAnimation{}
+
+type HoverColorAnimation struct {
+	id string
+
 	giu.Widget
 	hoveredColor,
 	normalColor func() color.RGBA
-	fps               int
-	duration          time.Duration
 	hoverID, normalID imgui.StyleColorID
 }
 
-func HoverColorAnimationStyle(widget giu.Widget, fps int, duration time.Duration, hover, normal giu.StyleColorID) *HoverColorAnimationWidget {
-	return HoverColorAnimation(
+func HoverColorStyle(
+	widget giu.Widget,
+	hover, normal giu.StyleColorID,
+) *HoverColorAnimation {
+	return HoverColor(
 		widget,
-		fps, duration,
 		func() color.RGBA {
 			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(hover)))
 		},
@@ -42,40 +46,34 @@ func HoverColorAnimationStyle(widget giu.Widget, fps int, duration time.Duration
 	)
 }
 
-func HoverColorAnimation(
+func HoverColor(
 	widget giu.Widget,
-	fps int, duration time.Duration,
 	hoverColor, normalColor func() color.RGBA,
 	hoverID, normalID giu.StyleColorID,
-) *HoverColorAnimationWidget {
-	result := &HoverColorAnimationWidget{
+) *HoverColorAnimation {
+	return &HoverColorAnimation{
+		id:           giu.GenAutoID("hoverColorAnimation"),
 		Widget:       widget,
 		hoveredColor: hoverColor,
 		normalColor:  normalColor,
-		fps:          fps,
-		duration:     duration,
 		hoverID:      imgui.StyleColorID(hoverID),
 		normalID:     imgui.StyleColorID(normalID),
 	}
-
-	result.AnimatorWidget = Animator(result, nil, nil)
-
-	return result
 }
 
-func (h *HoverColorAnimationWidget) Reset() {
+func (h *HoverColorAnimation) Reset() {
 	d := h.AnimatorWidget.CustomData()
 	if d == nil {
-		h.AnimatorWidget.SetCustomData(&animationData{
+		h.AnimatorWidget.SetCustomData(&hoverColorAnimationState{
 			m: &sync.Mutex{},
 		})
 
 		return
 	}
 
-	currentData, ok := d.(*animationData)
+	currentData, ok := d.(*hoverColorAnimationState)
 	if !ok {
-		logger.Fatalf("expected data type *animationData, got %T", d)
+		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
 	}
 
 	currentData.m.Lock()
@@ -83,15 +81,15 @@ func (h *HoverColorAnimationWidget) Reset() {
 	currentData.m.Unlock()
 }
 
-func (h *HoverColorAnimationWidget) Advance(procentDelta float32) bool {
+func (h *HoverColorAnimation) Advance(procentDelta float32) bool {
 	d := h.AnimatorWidget.CustomData()
 	if d == nil {
 		return true
 	}
 
-	data, ok := d.(*animationData)
+	data, ok := d.(*hoverColorAnimationState)
 	if !ok {
-		logger.Fatalf("expected data type *animationData, got %T", d)
+		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
 	}
 
 	data.m.Lock()
@@ -101,22 +99,22 @@ func (h *HoverColorAnimationWidget) Advance(procentDelta float32) bool {
 	return true
 }
 
-func (h *HoverColorAnimationWidget) Init() {
-	h.AnimatorWidget.SetCustomData(&animationData{
+func (h *HoverColorAnimation) Init() {
+	h.AnimatorWidget.SetCustomData(&hoverColorAnimationState{
 		m: &sync.Mutex{},
 	})
 }
 
-func (h *HoverColorAnimationWidget) Build() {
+func (h *HoverColorAnimation) Build() {
 	if h.getState().shouldInit {
 		h.Init()
 		h.getState().shouldInit = false
 	}
 
 	d := h.AnimatorWidget.CustomData()
-	data, ok := d.(*animationData)
+	data, ok := d.(*hoverColorAnimationState)
 	if !ok {
-		logger.Fatalf("expected data type *animationData, got %T", d)
+		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
 	}
 
 	normalColor := giu.ToVec4Color(h.normalColor())
@@ -170,4 +168,23 @@ func (h *HoverColorAnimationWidget) Build() {
 	data.shouldStart = isHoveredNow != isHovered && !state.IsRunning()
 	data.isHovered = isHoveredNow
 	data.m.Unlock()
+}
+
+func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
+	if s := giu.Context.GetState(a.id); s != nil {
+		state, ok := s.(*hoverColorAnimationState)
+		if !ok {
+			logger.Fatalf("expected state type *hoverColorAnimationState, got %T", s)
+		}
+
+		return state
+	}
+
+	giu.Context.SetState(a.id, a.newState())
+
+	return a.getState()
+}
+
+func (a *HoverColorAnimation) newState() *hoverColorAnimationState {
+	return &hoverColorAnimationState{}
 }

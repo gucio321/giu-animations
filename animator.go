@@ -100,5 +100,11 @@ func (t *AnimatorWidget) Build() {
 		s.m.Unlock()
 	}
 
-	t.a.Build()
+	if t.IsRunning() {
+		t.a.BuildAnimation(t.CurrentPercentageProgress())
+
+		return
+	}
+
+	t.a.BuildNormal()
 }

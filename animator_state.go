@@ -15,7 +15,6 @@ type animatorState struct {
 	currentLayout bool
 	elapsed       time.Duration
 	duration      time.Duration
-	customData    any
 	shouldInit    bool
 	m             *sync.Mutex
 }
@@ -50,40 +49,6 @@ func (t *AnimatorWidget) getState() *animatorState {
 	return t.getState()
 }
 
-// CustomData returns previously saved custom data or nil.
-// it is concurrency-safe
-func (t *AnimatorWidget) CustomData() any {
-	state := t.getState()
-
-	state.m.Lock()
-	defer state.m.Unlock()
-
-	return state.customData
-}
-
-// CustomData is a generic custom data getter.
-func CustomData[T any](a *AnimatorWidget) (out T, err error) {
-	d := a.CustomData()
-	if d == nil {
-		return out, nil
-	}
-
-	out, ok := d.(T)
-	if !ok {
-		return out, ErrInvalidDataType
-	}
-
-	return out, nil
-}
-
-// SetCustomData sets custom data.
-func (t *AnimatorWidget) SetCustomData(d any) {
-	state := t.getState()
-	state.m.Lock()
-	state.customData = d
-	state.m.Unlock()
-}
-
 // IsRunning returns true if the animation is already running.
 func (a *AnimatorWidget) IsRunning() bool {
 	s := a.getState()
@@ -98,4 +63,21 @@ func (a *AnimatorWidget) shouldInit() bool {
 	defer s.m.Unlock()
 
 	return s.shouldInit
+}
+
+func (a *AnimatorWidget) CurrentPercentageProgress() float32 {
+	if !a.IsRunning() {
+		return 0
+	}
+
+	s := a.getState()
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	result := float32(s.elapsed) / float32(s.duration)
+	if result > 1 {
+		return 1
+	}
+
+	return result
 }
