@@ -69,7 +69,6 @@ func (t *AnimatorWidget) Start() {
 				state.m.Lock()
 				state.isRunning = false
 				state.elapsed = 0
-				state.currentLayout = !state.currentLayout
 				state.m.Unlock()
 
 				return

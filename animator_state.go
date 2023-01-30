@@ -11,12 +11,13 @@ import (
 var _ giu.Disposable = &animatorState{}
 
 type animatorState struct {
-	isRunning     bool
-	currentLayout bool
-	elapsed       time.Duration
-	duration      time.Duration
-	shouldInit    bool
-	m             *sync.Mutex
+	shouldInit bool
+	isRunning  bool
+
+	elapsed  time.Duration
+	duration time.Duration
+
+	m *sync.Mutex
 }
 
 func (s *animatorState) Dispose() {
