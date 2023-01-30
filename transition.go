@@ -1,9 +1,10 @@
 package animations
 
 import (
+	"log"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"github.com/gucio321/giu-animations/internal/logger"
 )
 
 type transitionAnimationState struct {
@@ -63,14 +64,13 @@ func (t *TransitionAnimation) BuildNormal(starter func()) {
 	} else {
 		t.renderer2(starter)
 	}
-
 }
 
 func (t *TransitionAnimation) getState() *transitionAnimationState {
 	if s := giu.Context.GetState(t.id); s != nil {
 		state, ok := s.(*transitionAnimationState)
 		if !ok {
-			logger.Fatalf("expected state type *hoverColorAnimationState, got %T", s)
+			log.Panicf("expected state type *transitionAnimationState, got %T", s)
 		}
 
 		return state

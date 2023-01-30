@@ -1,7 +1,7 @@
 package animations
 
 import (
-	"github.com/gucio321/giu-animations/internal/logger"
+	"log"
 	"sync"
 	"time"
 
@@ -39,7 +39,7 @@ func (t *AnimatorWidget) getState() *animatorState {
 	if s := giu.Context.GetState(t.id); s != nil {
 		state, ok := s.(*animatorState)
 		if !ok {
-			logger.Fatalf("error asserting type of ttransition state: got %T", s)
+			log.Panicf("error asserting type of animator state: got %T, wanted *animatorState", s)
 		}
 
 		return state

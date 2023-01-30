@@ -1,11 +1,12 @@
 package animations
 
 import (
+	"image/color"
+	"log"
+	"sync"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"github.com/gucio321/giu-animations/internal/logger"
-	"image/color"
-	"sync"
 )
 
 type hoverColorAnimationState struct {
@@ -69,14 +70,11 @@ func (h *HoverColorAnimation) Init() {
 }
 
 func (h *HoverColorAnimation) BuildNormal(starter func()) {
-	logger.Infof("normal build")
 	data := h.getState()
 	data.m.Lock()
 	shouldStart := data.shouldStart
 	isHovered := data.isHovered
 	data.m.Unlock()
-
-	logger.Infof("should start %v, is hovered %v", shouldStart, isHovered)
 
 	if shouldStart {
 		data.m.Lock()
@@ -111,7 +109,6 @@ func (h *HoverColorAnimation) BuildNormal(starter func()) {
 }
 
 func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func()) {
-	logger.Infof("animation build; %v%%", percentage)
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	hoverColor := giu.ToVec4Color(h.hoveredColor())
@@ -126,14 +123,11 @@ func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func())
 		percentage = 1 - percentage
 	}
 
-	logger.Infof("percentage after hover check: %v%%", percentage)
-
 	normalColor.X += (hoverColor.X - normalColor.X) * percentage
 	normalColor.Y += (hoverColor.Y - normalColor.Y) * percentage
 	normalColor.Z += (hoverColor.Z - normalColor.Z) * percentage
 
 	h.build(normalColor)
-
 }
 
 func (h *HoverColorAnimation) build(c imgui.Vec4) {
@@ -152,7 +146,7 @@ func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
 	if s := giu.Context.GetState(a.id); s != nil {
 		state, ok := s.(*hoverColorAnimationState)
 		if !ok {
-			logger.Fatalf("expected state type *hoverColorAnimationState, got %T", s)
+			log.Panicf("expected state type *hoverColorAnimationState, got %T", s)
 		}
 
 		return state
