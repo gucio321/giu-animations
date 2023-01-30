@@ -27,13 +27,11 @@ type HoverColorAnimation struct {
 	hoveredColor,
 	normalColor func() color.RGBA
 	hoverID, normalID imgui.StyleColorID
-	onStart           func()
 }
 
 func HoverColorStyle(
 	widget giu.Widget,
 	hover, normal giu.StyleColorID,
-	onStart func(),
 ) *HoverColorAnimation {
 	return HoverColor(
 		widget,
@@ -44,7 +42,6 @@ func HoverColorStyle(
 			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(normal)))
 		},
 		hover, normal,
-		onStart,
 	)
 }
 
@@ -52,7 +49,6 @@ func HoverColor(
 	widget giu.Widget,
 	hoverColor, normalColor func() color.RGBA,
 	hoverID, normalID giu.StyleColorID,
-	onStart func(),
 ) *HoverColorAnimation {
 	return &HoverColorAnimation{
 		id:           giu.GenAutoID("hoverColorAnimation"),
@@ -61,7 +57,6 @@ func HoverColor(
 		normalColor:  normalColor,
 		hoverID:      imgui.StyleColorID(hoverID),
 		normalID:     imgui.StyleColorID(normalID),
-		onStart:      onStart,
 	}
 }
 
@@ -74,7 +69,7 @@ func (h *HoverColorAnimation) Init() {
 	// noop
 }
 
-func (h *HoverColorAnimation) BuildNormal() {
+func (h *HoverColorAnimation) BuildNormal(starter func()) {
 	data := h.getState()
 	data.m.Lock()
 	shouldStart := data.shouldStart
@@ -85,7 +80,7 @@ func (h *HoverColorAnimation) BuildNormal() {
 		data.m.Lock()
 		data.shouldStart = false
 		data.m.Unlock()
-		h.onStart()
+		starter()
 	}
 
 	var normalColor imgui.Vec4
@@ -97,9 +92,15 @@ func (h *HoverColorAnimation) BuildNormal() {
 	}
 
 	h.build(normalColor)
+	isHoveredNow := imgui.IsItemHovered()
+
+	data.m.Lock()
+	data.shouldStart = isHoveredNow != isHovered
+	data.isHovered = isHoveredNow
+	data.m.Unlock()
 }
 
-func (h *HoverColorAnimation) BuildAnimation(percentage float32) {
+func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func()) {
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	hoverColor := giu.ToVec4Color(h.hoveredColor())
@@ -120,12 +121,6 @@ func (h *HoverColorAnimation) BuildAnimation(percentage float32) {
 
 	h.build(normalColor)
 
-	isHoveredNow := imgui.IsItemHovered()
-
-	data.m.Lock()
-	data.shouldStart = isHoveredNow != isHovered
-	data.isHovered = isHoveredNow
-	data.m.Unlock()
 }
 
 func (h *HoverColorAnimation) build(c imgui.Vec4) {

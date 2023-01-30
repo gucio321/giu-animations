@@ -10,9 +10,11 @@ type Animation interface {
 	//Advance(procentageDelta float32) (shouldContinue bool)
 
 	// BuildNormal is called every frame when animation is not running
-	BuildNormal()
+	// starter is a link to Animator.Start
+	BuildNormal(starter func())
 	// BuildAnimation is called when running an animation.
 	// It receives the current animation progress as a float, where
 	// 0 >= animationPercentage <= 1
-	BuildAnimation(animationPercentage float32)
+	// starter is a link to Animator.Start
+	BuildAnimation(animationPercentage float32, starter func())
 }

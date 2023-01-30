@@ -54,7 +54,7 @@ func (t *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
 }
 
 // Start starts the animation.
-func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
+func (t *AnimatorWidget) Start() {
 	t.a.Reset()
 	state := t.getState()
 
@@ -63,10 +63,10 @@ func (t *AnimatorWidget) Start(duration time.Duration, fps int) {
 	}
 
 	state.isRunning = true
-	state.duration = duration
+	state.duration = t.duration
 
 	go func() {
-		tickDuration := time.Second / time.Duration(fps)
+		tickDuration := time.Second / time.Duration(t.fps)
 		for range time.Tick(tickDuration) {
 			if state.elapsed > state.duration {
 				state.m.Lock()
@@ -95,10 +95,10 @@ func (t *AnimatorWidget) Build() {
 	}
 
 	if t.IsRunning() {
-		t.a.BuildAnimation(t.CurrentPercentageProgress())
+		t.a.BuildAnimation(t.CurrentPercentageProgress(), t.Start)
 
 		return
 	}
 
-	t.a.BuildNormal()
+	t.a.BuildNormal(t.Start)
 }
