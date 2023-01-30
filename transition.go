@@ -1,5 +1,7 @@
 package animations
 
+/*
+
 import (
 	"github.com/AllenDang/imgui-go"
 	"github.com/gucio321/giu-animations/internal/logger"
@@ -82,3 +84,5 @@ func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
 
 	return false
 }
+
+*/

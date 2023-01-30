@@ -27,11 +27,13 @@ type HoverColorAnimation struct {
 	hoveredColor,
 	normalColor func() color.RGBA
 	hoverID, normalID imgui.StyleColorID
+	onStart           func()
 }
 
 func HoverColorStyle(
 	widget giu.Widget,
 	hover, normal giu.StyleColorID,
+	onStart func(),
 ) *HoverColorAnimation {
 	return HoverColor(
 		widget,
@@ -42,6 +44,7 @@ func HoverColorStyle(
 			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(normal)))
 		},
 		hover, normal,
+		onStart,
 	)
 }
 
@@ -49,6 +52,7 @@ func HoverColor(
 	widget giu.Widget,
 	hoverColor, normalColor func() color.RGBA,
 	hoverID, normalID giu.StyleColorID,
+	onStart func(),
 ) *HoverColorAnimation {
 	return &HoverColorAnimation{
 		id:           giu.GenAutoID("hoverColorAnimation"),
@@ -57,6 +61,7 @@ func HoverColor(
 		normalColor:  normalColor,
 		hoverID:      imgui.StyleColorID(hoverID),
 		normalID:     imgui.StyleColorID(normalID),
+		onStart:      onStart,
 	}
 }
 
@@ -66,25 +71,11 @@ func (h *HoverColorAnimation) Reset() {
 }
 
 func (h *HoverColorAnimation) Init() {
-	h.AnimatorWidget.SetCustomData(&hoverColorAnimationState{
-		m: &sync.Mutex{},
-	})
+	// noop
 }
 
-func (h *HoverColorAnimation) Build() {
-	if h.getState().shouldInit {
-		h.Init()
-		h.getState().shouldInit = false
-	}
-
-	d := h.AnimatorWidget.CustomData()
-	data, ok := d.(*hoverColorAnimationState)
-	if !ok {
-		logger.Fatalf("expected data type *hoverColorAnimationState, got %T", d)
-	}
-
-	normalColor := giu.ToVec4Color(h.normalColor())
-	hoverColor := giu.ToVec4Color(h.hoveredColor())
+func (h *HoverColorAnimation) BuildNormal() {
+	data := h.getState()
 	data.m.Lock()
 	shouldStart := data.shouldStart
 	isHovered := data.isHovered
@@ -94,46 +85,59 @@ func (h *HoverColorAnimation) Build() {
 		data.m.Lock()
 		data.shouldStart = false
 		data.m.Unlock()
-		h.Start(h.duration, h.fps)
+		h.onStart()
 	}
 
+	var normalColor imgui.Vec4
+
+	if isHovered {
+		normalColor = giu.ToVec4Color(h.hoveredColor())
+	} else {
+		normalColor = giu.ToVec4Color(h.normalColor())
+	}
+
+	h.build(normalColor)
+}
+
+func (h *HoverColorAnimation) BuildAnimation(percentage float32) {
+	data := h.getState()
+	normalColor := giu.ToVec4Color(h.normalColor())
+	hoverColor := giu.ToVec4Color(h.hoveredColor())
 	data.m.Lock()
-	procentage := data.procentage
+	isHovered := data.isHovered
 	data.m.Unlock()
 
-	state := h.AnimatorWidget.getState()
+	data.m.Lock()
+	data.m.Unlock()
 
-	if !isHovered && state.IsRunning() {
-		procentage = 1 - procentage
+	if !isHovered /*&& state.IsRunning()*/ {
+		percentage = 1 - percentage
 	}
 
-	normalColor.X += (hoverColor.X - normalColor.X) * procentage
-	normalColor.Y += (hoverColor.Y - normalColor.Y) * procentage
-	normalColor.Z += (hoverColor.Z - normalColor.Z) * procentage
+	normalColor.X += (hoverColor.X - normalColor.X) * percentage
+	normalColor.Y += (hoverColor.Y - normalColor.Y) * percentage
+	normalColor.Z += (hoverColor.Z - normalColor.Z) * percentage
 
-	if !state.IsRunning() {
-		if isHovered {
-			normalColor = hoverColor
-		} else {
-			normalColor = giu.ToVec4Color(h.normalColor())
-		}
-	}
+	h.build(normalColor)
 
-	imgui.PushStyleColor(h.normalID, normalColor)
+	isHoveredNow := imgui.IsItemHovered()
+
+	data.m.Lock()
+	data.shouldStart = isHoveredNow != isHovered
+	data.isHovered = isHoveredNow
+	data.m.Unlock()
+}
+
+func (h *HoverColorAnimation) build(c imgui.Vec4) {
+	imgui.PushStyleColor(h.normalID, c)
 
 	if h.hoverID != h.normalID {
-		imgui.PushStyleColor(h.hoverID, normalColor)
+		imgui.PushStyleColor(h.hoverID, c)
 		defer imgui.PopStyleColor()
 	}
 
 	h.Widget.Build()
 	imgui.PopStyleColor()
-	isHoveredNow := imgui.IsItemHovered()
-
-	data.m.Lock()
-	data.shouldStart = isHoveredNow != isHovered && !state.IsRunning()
-	data.isHovered = isHoveredNow
-	data.m.Unlock()
 }
 
 func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
