@@ -1,45 +1,53 @@
 package animations
 
-/*
-
 import (
+	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
 	"github.com/gucio321/giu-animations/internal/logger"
-	"time"
 )
 
+type transitionAnimationState struct {
+	layout int
+}
+
+func (s *transitionAnimationState) Dispose() {}
+
+var _ Animation = &TransitionWidget{}
+
 type TransitionWidget struct {
-	a *AnimatorWidget
+	id                   string
+	renderer1, renderer2 func(starter func())
 }
 
-func Transition(renderer1, renderer2 func(Animation)) *TransitionWidget {
-	result := &TransitionWidget{}
-	result.a = Animator(result, renderer1, renderer2)
-	return result
+func Transition(renderer1, renderer2 func(starter func())) *TransitionWidget {
+	return &TransitionWidget{
+		id:        giu.GenAutoID("transitionAnimation"),
+		renderer1: renderer1,
+		renderer2: renderer2,
+	}
 }
 
-func (t *TransitionWidget) Start(d time.Duration, fps int) {
-	t.a.Start(d, fps)
-}
-
-func (t *TransitionWidget) Advance(procentDelta float32) bool {
-	state := t.a.getState()
+func (t *TransitionWidget) BuildAnimation(percentage float32, starter func()) {
+	state := t.getState()
 	// it means the current layou is layout1, so increasing procentage
-	if state.currentLayout {
-		t.a.SetCustomData(procentDelta)
-	} else {
-		t.a.SetCustomData(1 - procentDelta)
+	if state.layout == 1 {
+		percentage = 1 - percentage
 	}
 
-	return true
+	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, percentage)
+	t.renderer1(starter)
+	imgui.PopStyleVar()
+	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, 1-percentage)
+	t.renderer2(starter)
+	imgui.PopStyleVar()
 }
 
 func (t *TransitionWidget) Reset() {
-	state := t.a.getState()
-	if state.currentLayout {
-		t.a.SetCustomData(float32(0))
+	state := t.getState()
+	if state.layout == 0 {
+		state.layout = 1
 	} else {
-		t.a.SetCustomData(float32(1))
+		state.layout = 0
 	}
 }
 
@@ -47,42 +55,32 @@ func (t *TransitionWidget) Init() {
 	// noop
 }
 
-func (t *TransitionWidget) Build() {
-	if t.a.BuildNormal(t) {
-		return
-	}
-
-	d := t.a.CustomData()
-	layout1ProcentageAlpha, ok := d.(float32)
-	if !ok {
-		logger.Fatal("invalid custom data type: wanted float32 got %t", d)
-	}
-	if layout1ProcentageAlpha > 1 {
-		logger.Fatalf("AnimatorWidget: procentage alpha is %v (should be in range 0-1)", layout1ProcentageAlpha)
-	}
-
-	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, layout1ProcentageAlpha)
-	t.a.renderer1(t)
-	imgui.PopStyleVar()
-	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, 1-layout1ProcentageAlpha)
-	t.a.renderer2(t)
-	imgui.PopStyleVar()
-}
-
-func (t *AnimatorWidget) BuildNormal(a Animation) (proceeded bool) {
+func (t *TransitionWidget) BuildNormal(starter func()) {
 	state := t.getState()
 
-	if !state.IsRunning() {
-		if !state.currentLayout {
-			t.renderer1(a)
-		} else {
-			t.renderer2(a)
-		}
-
-		return true
+	if state.layout == 0 {
+		t.renderer1(starter)
+	} else {
+		t.renderer2(starter)
 	}
 
-	return false
 }
 
-*/
+func (t *TransitionWidget) getState() *transitionAnimationState {
+	if s := giu.Context.GetState(t.id); s != nil {
+		state, ok := s.(*transitionAnimationState)
+		if !ok {
+			logger.Fatalf("expected state type *hoverColorAnimationState, got %T", s)
+		}
+
+		return state
+	}
+
+	giu.Context.SetState(t.id, t.newState())
+
+	return t.getState()
+}
+
+func (t *TransitionWidget) newState() *transitionAnimationState {
+	return &transitionAnimationState{}
+}
