@@ -12,22 +12,22 @@ type transitionAnimationState struct {
 
 func (s *transitionAnimationState) Dispose() {}
 
-var _ Animation = &TransitionWidget{}
+var _ Animation = &TransitionAnimation{}
 
-type TransitionWidget struct {
+type TransitionAnimation struct {
 	id                   string
 	renderer1, renderer2 func(starter func())
 }
 
-func Transition(renderer1, renderer2 func(starter func())) *TransitionWidget {
-	return &TransitionWidget{
+func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation {
+	return &TransitionAnimation{
 		id:        giu.GenAutoID("transitionAnimation"),
 		renderer1: renderer1,
 		renderer2: renderer2,
 	}
 }
 
-func (t *TransitionWidget) BuildAnimation(percentage float32, starter func()) {
+func (t *TransitionAnimation) BuildAnimation(percentage float32, starter func()) {
 	state := t.getState()
 	// it means the current layou is layout1, so increasing procentage
 	if state.layout == 1 {
@@ -42,7 +42,7 @@ func (t *TransitionWidget) BuildAnimation(percentage float32, starter func()) {
 	imgui.PopStyleVar()
 }
 
-func (t *TransitionWidget) Reset() {
+func (t *TransitionAnimation) Reset() {
 	state := t.getState()
 	if state.layout == 0 {
 		state.layout = 1
@@ -51,11 +51,11 @@ func (t *TransitionWidget) Reset() {
 	}
 }
 
-func (t *TransitionWidget) Init() {
+func (t *TransitionAnimation) Init() {
 	// noop
 }
 
-func (t *TransitionWidget) BuildNormal(starter func()) {
+func (t *TransitionAnimation) BuildNormal(starter func()) {
 	state := t.getState()
 
 	if state.layout == 0 {
@@ -66,7 +66,7 @@ func (t *TransitionWidget) BuildNormal(starter func()) {
 
 }
 
-func (t *TransitionWidget) getState() *transitionAnimationState {
+func (t *TransitionAnimation) getState() *transitionAnimationState {
 	if s := giu.Context.GetState(t.id); s != nil {
 		state, ok := s.(*transitionAnimationState)
 		if !ok {
@@ -81,6 +81,6 @@ func (t *TransitionWidget) getState() *transitionAnimationState {
 	return t.getState()
 }
 
-func (t *TransitionWidget) newState() *transitionAnimationState {
+func (t *TransitionAnimation) newState() *transitionAnimationState {
 	return &transitionAnimationState{}
 }
