@@ -3,6 +3,8 @@
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
 animation system.
 
+![giu-animations demo](./docs/demo.gif)
+
 # Documentation
 
 ## How to use?
