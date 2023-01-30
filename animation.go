@@ -6,8 +6,6 @@ type Animation interface {
 	Init()
 	// Reset is called whenever needs to restart animation.
 	Reset()
-	// Advance is called every frame
-	//Advance(procentageDelta float32) (shouldContinue bool)
 
 	// BuildNormal is called every frame when animation is not running
 	// starter is a link to Animator.Start
