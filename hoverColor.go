@@ -61,8 +61,7 @@ func HoverColor(
 }
 
 func (h *HoverColorAnimation) Reset() {
-	// TODO
-	//currentData := h.getState()
+	// noop
 }
 
 func (h *HoverColorAnimation) Init() {
@@ -70,11 +69,14 @@ func (h *HoverColorAnimation) Init() {
 }
 
 func (h *HoverColorAnimation) BuildNormal(starter func()) {
+	logger.Infof("normal build")
 	data := h.getState()
 	data.m.Lock()
 	shouldStart := data.shouldStart
 	isHovered := data.isHovered
 	data.m.Unlock()
+
+	logger.Infof("should start %v, is hovered %v", shouldStart, isHovered)
 
 	if shouldStart {
 		data.m.Lock()
@@ -85,10 +87,18 @@ func (h *HoverColorAnimation) BuildNormal(starter func()) {
 
 	var normalColor imgui.Vec4
 
+	if shouldStart {
+		isHovered = !isHovered
+	}
+
 	if isHovered {
 		normalColor = giu.ToVec4Color(h.hoveredColor())
 	} else {
 		normalColor = giu.ToVec4Color(h.normalColor())
+	}
+
+	if shouldStart {
+		isHovered = !isHovered
 	}
 
 	h.build(normalColor)
@@ -101,6 +111,7 @@ func (h *HoverColorAnimation) BuildNormal(starter func()) {
 }
 
 func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func()) {
+	logger.Infof("animation build; %v%%", percentage)
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	hoverColor := giu.ToVec4Color(h.hoveredColor())
@@ -114,6 +125,8 @@ func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func())
 	if !isHovered /*&& state.IsRunning()*/ {
 		percentage = 1 - percentage
 	}
+
+	logger.Infof("percentage after hover check: %v%%", percentage)
 
 	normalColor.X += (hoverColor.X - normalColor.X) * percentage
 	normalColor.Y += (hoverColor.Y - normalColor.Y) * percentage
