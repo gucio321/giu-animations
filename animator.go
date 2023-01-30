@@ -2,7 +2,6 @@
 package animations
 
 import (
-	"github.com/gucio321/giu-animations/internal/logger"
 	"time"
 
 	"github.com/AllenDang/giu"
@@ -59,10 +58,6 @@ func (t *AnimatorWidget) Start() {
 	state := t.getState()
 
 	state.m.Lock()
-	if state.isRunning {
-		logger.Fatal("AnimatorWidget: StartTransition called, but transition is already running")
-	}
-
 	state.isRunning = true
 	state.duration = t.duration
 	state.m.Unlock()
