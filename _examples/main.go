@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/AllenDang/giu"
+	"github.com/AllenDang/imgui-go"
 	animations "github.com/gucio321/giu-animations"
 	"golang.org/x/image/colornames"
 	"image/color"
@@ -28,6 +29,13 @@ func loop() {
 							giu.StyleColorButtonHovered,
 							giu.StyleColorButton,
 						),
+					).Duration(time.Second).FPS(60),
+					animations.Animator(
+						animations.Move(func(starter func()) giu.Widget {
+							return giu.Button("move me!").OnClick(func() {
+								starter()
+							})
+						}, imgui.Vec2{X: 20, Y: 20}),
 					).Duration(time.Second).FPS(60),
 				)
 			},
