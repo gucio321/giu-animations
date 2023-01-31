@@ -13,8 +13,6 @@ const (
 )
 
 // AnimatorWidget is a manager for animation.
-// It is a giu.Widget, but you should reather store it in a variable
-// in order to be able to call Start.
 type AnimatorWidget struct {
 	id string
 
