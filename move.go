@@ -41,6 +41,8 @@ type MoveAnimation struct {
 
 	widget   func(starter func()) giu.Widget
 	posDelta imgui.Vec2
+
+	alg EasingAlgorithmType
 }
 
 func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
@@ -60,6 +62,11 @@ func (m *MoveAnimation) Reset() {
 	state.state = !state.state
 }
 
+func (m *MoveAnimation) Algorithm(algorithm EasingAlgorithmType) *MoveAnimation {
+	m.alg = algorithm
+	return m
+}
+
 func (m *MoveAnimation) BuildNormal(starter func()) {
 	state := m.getState()
 	if state.state {
@@ -77,6 +84,30 @@ func (m *MoveAnimation) BuildNormal(starter func()) {
 
 func (m *MoveAnimation) BuildAnimation(animationPercentage float32, starter func()) {
 	state := m.getState()
+
+	switch m.alg {
+	case EasingAlgNone:
+	// noop
+	case EasingAlgInSine:
+		animationPercentage = easingAlgInSine(animationPercentage)
+	case EasingAlgOutSine:
+		animationPercentage = easingAlgOutSine(animationPercentage)
+	case EasingAlgInOutSine:
+		animationPercentage = easingAlgInOutSine(animationPercentage)
+	case EasingAlgInElastic:
+		animationPercentage = easingAlgInElastic(animationPercentage)
+	case EasingAlgOutElastic:
+		animationPercentage = easingAlgOutElastic(animationPercentage)
+	case EasingAlgInOutElastic:
+		animationPercentage = easingAlgInOutElastic(animationPercentage)
+	case EasingAlgInBounce:
+		animationPercentage = easingAlgInBounce(animationPercentage)
+	case EasingAlgOutBounce:
+		animationPercentage = easingAlgOutBounce(animationPercentage)
+	case EasingAlgInOutBounce:
+		animationPercentage = easingAlgInOutBounce(animationPercentage)
+	}
+
 	if !state.state {
 		animationPercentage = 1 - animationPercentage
 	}

@@ -9,7 +9,10 @@ import (
 	"time"
 )
 
+var easingAlg = animations.EasingAlgNone
+
 func loop() {
+	a := int32(easingAlg)
 	animations.Animator(
 		animations.Transition(
 			func(starter func()) {
@@ -32,11 +35,19 @@ func loop() {
 					).Duration(time.Second).FPS(60),
 					animations.Animator(
 						animations.Move(func(starter func()) giu.Widget {
-							return giu.Button("move me!").OnClick(func() {
-								starter()
-							})
-						}, imgui.Vec2{X: 20, Y: 20}),
-					).Duration(time.Second).FPS(60),
+							return giu.Child().Layout(
+								giu.Row(
+									giu.Label("Set easing alg:"),
+									giu.SliderInt(&a, 0, int32(animations.EasingAlgMax-1)).Size(100).OnChange(func() {
+										easingAlg = animations.EasingAlgorithmType(a)
+									}),
+								),
+								giu.Button("move me!").OnClick(func() {
+									starter()
+								}),
+							).Size(200, 80)
+						}, imgui.Vec2{X: 20, Y: 100}).Algorithm(easingAlg),
+					).Duration(time.Second*3).FPS(120),
 				)
 			},
 			func(starter func()) {
