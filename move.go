@@ -94,6 +94,12 @@ func (m *MoveAnimation) BuildAnimation(animationPercentage float32, starter func
 		animationPercentage = easingAlgOutSine(animationPercentage)
 	case EasingAlgInOutSine:
 		animationPercentage = easingAlgInOutSine(animationPercentage)
+	case EasingAlgInBack:
+		animationPercentage = easingAlgInBack(animationPercentage)
+	case EasingAlgOutBack:
+		animationPercentage = easingAlgOutBack(animationPercentage)
+	case EasingAlgInOutBack:
+		animationPercentage = easingAlgInOutBack(animationPercentage)
 	case EasingAlgInElastic:
 		animationPercentage = easingAlgInElastic(animationPercentage)
 	case EasingAlgOutElastic:

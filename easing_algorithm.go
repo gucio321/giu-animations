@@ -13,6 +13,9 @@ const (
 	EasingAlgInSine
 	EasingAlgOutSine
 	EasingAlgInOutSine
+	EasingAlgInBack
+	EasingAlgOutBack
+	EasingAlgInOutBack
 	EasingAlgInElastic
 	EasingAlgOutElastic
 	EasingAlgInOutElastic
@@ -32,6 +35,27 @@ func easingAlgOutSine(p float32) float32 {
 
 func easingAlgInOutSine(p float32) float32 {
 	return -(float32(math.Cos(math.Pi*float64(p))) - 1) / 2
+}
+
+func easingAlgInBack(p float32) float32 {
+	s := float32(1.70158)
+	return p * p * ((s+1)*p - s)
+}
+
+func easingAlgOutBack(p float32) float32 {
+	s := float32(1.70158)
+	p -= 1
+	return p*p*((s+1)*p+s) + 1
+}
+
+func easingAlgInOutBack(p float32) float32 {
+	s := float32(1.70158) * 1.525
+	p *= 2
+	if p < 1 {
+		return 0.5 * (p * p * ((s+1)*p - s))
+	}
+	p -= 2
+	return 0.5 * (p*p*((s+1)*p+s) + 2)
 }
 
 func easingAlgInElastic(p float32) float32 {
