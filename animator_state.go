@@ -24,7 +24,7 @@ func (s *animatorState) Dispose() {
 	// noop
 }
 
-func (t *AnimatorWidget) newState() *animatorState {
+func (a *AnimatorWidget) newState() *animatorState {
 	return &animatorState{
 		shouldInit: true,
 		m:          &sync.Mutex{},
@@ -35,8 +35,8 @@ func (t *AnimatorWidget) newState() *animatorState {
 // It could not be public, because of concurrency issues.
 // There is a bunch of Animator's methods that allows
 // user to obtain certain data.
-func (t *AnimatorWidget) getState() *animatorState {
-	if s := giu.Context.GetState(t.id); s != nil {
+func (a *AnimatorWidget) getState() *animatorState {
+	if s := giu.Context.GetState(a.id); s != nil {
 		state, ok := s.(*animatorState)
 		if !ok {
 			log.Panicf("error asserting type of animator state: got %T, wanted *animatorState", s)
@@ -45,9 +45,9 @@ func (t *AnimatorWidget) getState() *animatorState {
 		return state
 	}
 
-	giu.Context.SetState(t.id, t.newState())
+	giu.Context.SetState(a.id, a.newState())
 
-	return t.getState()
+	return a.getState()
 }
 
 // IsRunning returns true if the animation is already running.

@@ -30,7 +30,7 @@ func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation 
 
 func (t *TransitionAnimation) BuildAnimation(percentage float32, starter func()) {
 	state := t.getState()
-	// it means the current layou is layout1, so increasing procentage
+	// it means the current layout is layout1, so increasing percentage
 	if state.layout == 1 {
 		percentage = 1 - percentage
 	}

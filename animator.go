@@ -38,32 +38,32 @@ func Animator(a Animation) *AnimatorWidget {
 
 // FPS allows to specify FPS value.
 // CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
-func (t *AnimatorWidget) FPS(fps int) *AnimatorWidget {
-	t.fps = fps
+func (a *AnimatorWidget) FPS(fps int) *AnimatorWidget {
+	a.fps = fps
 
-	return t
+	return a
 }
 
 // Duration allows to specify duration value.
 // CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
-func (t *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
-	t.duration = duration
+func (a *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
+	a.duration = duration
 
-	return t
+	return a
 }
 
 // Start starts the animation.
-func (t *AnimatorWidget) Start() {
-	t.a.Reset()
-	state := t.getState()
+func (a *AnimatorWidget) Start() {
+	a.a.Reset()
+	state := a.getState()
 
 	state.m.Lock()
 	state.isRunning = true
-	state.duration = t.duration
+	state.duration = a.duration
 	state.m.Unlock()
 
 	go func() {
-		tickDuration := time.Second / time.Duration(t.fps)
+		tickDuration := time.Second / time.Duration(a.fps)
 		for range time.Tick(tickDuration) {
 			if state.elapsed > state.duration {
 				state.m.Lock()
@@ -81,20 +81,20 @@ func (t *AnimatorWidget) Start() {
 }
 
 // Build implements giu.Widget
-func (t *AnimatorWidget) Build() {
-	if t.shouldInit() {
-		t.a.Init()
-		s := t.getState()
+func (a *AnimatorWidget) Build() {
+	if a.shouldInit() {
+		a.a.Init()
+		s := a.getState()
 		s.m.Lock()
 		s.shouldInit = false
 		s.m.Unlock()
 	}
 
-	if t.IsRunning() {
-		t.a.BuildAnimation(t.CurrentPercentageProgress(), t.Start)
+	if a.IsRunning() {
+		a.a.BuildAnimation(a.CurrentPercentageProgress(), a.Start)
 
 		return
 	}
 
-	t.a.BuildNormal(t.Start)
+	a.a.BuildNormal(a.Start)
 }

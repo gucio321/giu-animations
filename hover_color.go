@@ -30,6 +30,7 @@ type HoverColorAnimation struct {
 	hoverID, normalID imgui.StyleColorID
 }
 
+// HoverColorStyle wraps HoverColor so that it automatically obtains the color for specified style values.
 func HoverColorStyle(
 	widget giu.Widget,
 	hover, normal giu.StyleColorID,
@@ -108,7 +109,7 @@ func (h *HoverColorAnimation) BuildNormal(starter func()) {
 	data.m.Unlock()
 }
 
-func (h *HoverColorAnimation) BuildAnimation(percentage float32, starter func()) {
+func (h *HoverColorAnimation) BuildAnimation(percentage float32, _ func()) {
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	hoverColor := giu.ToVec4Color(h.hoveredColor())
@@ -142,8 +143,8 @@ func (h *HoverColorAnimation) build(c imgui.Vec4) {
 	imgui.PopStyleColor()
 }
 
-func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
-	if s := giu.Context.GetState(a.id); s != nil {
+func (h *HoverColorAnimation) getState() *hoverColorAnimationState {
+	if s := giu.Context.GetState(h.id); s != nil {
 		state, ok := s.(*hoverColorAnimationState)
 		if !ok {
 			log.Panicf("expected state type *hoverColorAnimationState, got %T", s)
@@ -152,12 +153,12 @@ func (a *HoverColorAnimation) getState() *hoverColorAnimationState {
 		return state
 	}
 
-	giu.Context.SetState(a.id, a.newState())
+	giu.Context.SetState(h.id, h.newState())
 
-	return a.getState()
+	return h.getState()
 }
 
-func (a *HoverColorAnimation) newState() *hoverColorAnimationState {
+func (h *HoverColorAnimation) newState() *hoverColorAnimationState {
 	return &hoverColorAnimationState{
 		m: &sync.Mutex{},
 	}
