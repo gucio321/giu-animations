@@ -1,10 +1,9 @@
 package animations
 
 import (
-	"log"
-
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
+	"log"
 )
 
 type moveAnimationState struct {
@@ -43,7 +42,9 @@ type MoveAnimation struct {
 	widget   func(starter func()) giu.Widget
 	posDelta imgui.Vec2
 
-	alg EasingAlgorithmType
+	alg       EasingAlgorithmType
+	useBezier bool
+	bezier    []imgui.Vec2
 }
 
 func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
@@ -56,6 +57,17 @@ func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation
 
 func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
 	m.getState().startPos = startPos
+	return m
+}
+
+func (m *MoveAnimation) Bezier(points ...imgui.Vec2) *MoveAnimation {
+	if len(points) > 2 {
+		points = points[:2]
+	}
+
+	m.useBezier = true
+	m.bezier = points
+
 	return m
 }
 
@@ -124,9 +136,25 @@ func (m *MoveAnimation) BuildAnimation(animationPercentage float32, starter func
 		animationPercentage = 1 - animationPercentage
 	}
 
-	pos := imgui.Vec2{
-		X: state.startPos.X + m.posDelta.X*animationPercentage,
-		Y: state.startPos.Y + m.posDelta.Y*animationPercentage,
+	var pos imgui.Vec2
+	if m.useBezier {
+		pts := []imgui.Vec2{state.startPos}
+		for _, b := range m.bezier {
+			pts = append(pts, imgui.Vec2{
+				X: b.X + state.startPos.X,
+				Y: b.Y + state.startPos.Y,
+			})
+		}
+		pts = append(pts, imgui.Vec2{
+			X: state.startPos.X + m.posDelta.X,
+			Y: state.startPos.Y + m.posDelta.Y,
+		})
+		pos = bezier(animationPercentage, pts)
+	} else {
+		pos = imgui.Vec2{
+			X: state.startPos.X + m.posDelta.X*animationPercentage,
+			Y: state.startPos.Y + m.posDelta.Y*animationPercentage,
+		}
 	}
 
 	imgui.SetCursorScreenPos(pos)
