@@ -70,9 +70,6 @@ func() color.RGBA {
 
 #### Move 
 
-Movement animation's api is Work In Progress right now,
-so its design _could_ be extended in future.
-
 ```go
 Move(
     w giu.Widget,
