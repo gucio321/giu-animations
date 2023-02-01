@@ -20,12 +20,13 @@ that uses the same imgui-go version as yours)
 ### Defining an animation
 
 At the moment, there are two implementations of animations:
-- Transition - a smooth transition between two windows/sets of windows e.t.c.
+- [Transition](#transition) - a smooth transition between two windows/sets of windows e.t.c.
   **NOTE** applying this animation to single widgets is not implemented yet and may
   not work as expected.
-- on-hover color change - you can apply this animation to any **single widget**
+- [on-hover color change](#hover-color) - you can apply this animation to any **single widget**
   that `imgui.IsItemHovered` applies for.
   You can specify any style color you want.
+- [Movement](#move) - moves DrawCursor emulating moving an object (`giu.Widget`).
 
 Lets shortly discuss particular types of animations:
 
@@ -44,7 +45,7 @@ alpha value is pushed to imgui style for both of them.
 The argument to the poth renderers is a pointer to Animator.Start (see later)
 so that you can call it to play the animation.
 
-#### hover color
+#### Hover color
 
 ```go
 func HoverColor(
