@@ -1,9 +1,10 @@
 package animations
 
 import (
+	"log"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"log"
 )
 
 type moveAnimationState struct {
@@ -51,6 +52,11 @@ func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation
 		widget:   w,
 		posDelta: posDelta,
 	}
+}
+
+func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
+	m.getState().startPos = startPos
+	return m
 }
 
 func (m *MoveAnimation) Init() {

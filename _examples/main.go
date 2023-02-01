@@ -1,12 +1,15 @@
 package main
 
 import (
-	"github.com/AllenDang/giu"
-	"github.com/AllenDang/imgui-go"
-	animations "github.com/gucio321/giu-animations"
-	"golang.org/x/image/colornames"
 	"image/color"
 	"time"
+
+	"golang.org/x/image/colornames"
+
+	"github.com/AllenDang/giu"
+	"github.com/AllenDang/imgui-go"
+
+	animations "github.com/gucio321/giu-animations"
 )
 
 var easingAlg = animations.EasingAlgNone
@@ -46,7 +49,7 @@ func loop() {
 									starter()
 								}),
 							).Size(200, 80)
-						}, imgui.Vec2{X: 20, Y: 100}).Algorithm(easingAlg),
+						}, imgui.Vec2{X: 20, Y: 100}).Algorithm(easingAlg).StartPos(imgui.Vec2{5, 80}),
 					).Duration(time.Second*3).FPS(120),
 				)
 			},
