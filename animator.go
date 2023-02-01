@@ -73,7 +73,10 @@ func (a *AnimatorWidget) Start() {
 			}
 
 			giu.Update()
+
+			state.m.Lock()
 			state.elapsed += tickDuration
+			state.m.Unlock()
 		}
 	}()
 }
