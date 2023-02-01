@@ -58,6 +58,55 @@ func HoverColor(
 - hoverColor and normalColor are functions that returns hover and standard (non-hover) colors
 - hoverID, normalID - style IDs that hovering applies to.
 
+There is also a variant of the above method called `HoverColorStyle`, which does not need
+`hoverColor` and `normalColor` arguments. These colors are obtained
+by function like this:
+```go
+func() color.RGBA {
+    return imgui.CurrentStyle().GetStyleColor(styleID)
+}
+```
+
+#### Move 
+
+Movement animation's api is Work In Progress right now,
+so its design _could_ be extended in future.
+
+```go
+Move(
+    w giu.Widget,
+    delta imgui.Vec2,
+) *MoveAnimation {...}
+```
+
+This will mmove `w` from the position, it was
+at the moment of calling `Move(...)` (called `start`)
+to `start` + `delta`.
+
+##### Easing
+
+There are some extra ways of playing animation flow:
+
+```go
+const (
+        EasingAlgNone EasingAlgorithmType = iota
+        EasingAlgInSine
+        EasingAlgOutSine
+        EasingAlgInOutSine
+        EasingAlgInBack
+        EasingAlgOutBack
+        EasingAlgInOutBack
+        EasingAlgInElastic
+        EasingAlgOutElastic
+        EasingAlgInOutElastic
+        EasingAlgInBounce
+        EasingAlgOutBounce
+        EasingAlgInOutBounce
+)
+```
+
+for further reference, see https://easings.net
+
 ### Using animator
 
 After constructing an animation, you need to create a special type of giu widget
@@ -68,7 +117,7 @@ animator's api is designed so that you don't need to do so every time.
 
 As an argument to `Animator(...)` constuctor, you pass perviously created animation.
 
-Animator has a few useful methods:
+Animator has some useful methods:
 - `Duration` allows you to specify animation's duration (default is 0.25 s)
 - `FPS` sets Frames per second value for animation playback (default is 60)
    **NOTE** it is not real application's FPS! It just describes how often
@@ -93,8 +142,6 @@ type Animation interface {
 _This is a copy from animation.go, but I've removed comments for clearity_
 
 ### Init
-
-**CAUTION** I'm planning to remove this in future
 
 init is called once, during first call of Animator.Build
 you can put some initialization here.
@@ -126,8 +173,6 @@ your contribution is welcome!
 
 For now, this system is used in one of [The Greater Heptavirate's](https://github.com/TheGraterHeptavirate) projects.
 But (as I'm an author of that system) I've decided to share it for public - feel free to use if you can find any use case.
-
-
 
 # License
 
