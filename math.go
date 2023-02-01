@@ -17,8 +17,12 @@ func factorial(n int) int {
 func bezier(t float32, points []imgui.Vec2) imgui.Vec2 {
 	var result imgui.Vec2
 	for i := 0; i < len(points); i++ {
-		result.X += points[i].X * (float32(factorial(len(points)-1)) / float32(factorial(i)*factorial(len(points)-1-i)) * (float32(math.Pow(float64(t), float64(i))) * (float32(math.Pow(float64(1-t), float64(len(points)-1-i))))))
-		result.Y += points[i].Y * (float32(factorial(len(points)-1)) / float32(factorial(i)*factorial(len(points)-1-i)) * (float32(math.Pow(float64(t), float64(i))) * (float32(math.Pow(float64(1-t), float64(len(points)-1-i))))))
+		d := float32(factorial(len(points)-1)) /
+			float32(factorial(i)*factorial(len(points)-1-i)) *
+			(float32(math.Pow(float64(t), float64(i))) *
+				(float32(math.Pow(float64(1-t), float64(len(points)-1-i)))))
+		result.X += points[i].X * d
+		result.Y += points[i].Y * d
 	}
 
 	return result
