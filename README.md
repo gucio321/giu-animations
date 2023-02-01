@@ -107,6 +107,25 @@ const (
 
 for further reference, see https://easings.net
 
+##### Bezier curve
+
+Move animation supports [Bezier Curve](https://pomax.github.io/bezierinfo/).
+It meas that move animation could be very smooth if you find it necessary.
+You have two ways to calculate these points:
+- go through [google](https://google.com) and use tone of paper to understand this strange math or
+- just type random values and check what happens :smile:
+
+The api looks as follows:
+
+```go
+func (m *MoveAnimation) Bezier(controlPoints ...imgui.Vec2) *MoveAnimation {...}
+```
+
+you can add as many control points as you which to.
+Each point will make the curve stranger.
+The only thing you need to remember is, that **these points
+are relative to `startPos`**. They will automatically become `startPos` + `controlPoint`.
+
 ### Using animator
 
 After constructing an animation, you need to create a special type of giu widget
