@@ -16,8 +16,9 @@ const (
 type AnimatorWidget struct {
 	id string
 
-	duration time.Duration
-	fps      int
+	duration        time.Duration
+	fps             int
+	easingAlgorithm EasingAlgorithmType
 
 	a Animation
 }
@@ -25,10 +26,11 @@ type AnimatorWidget struct {
 // Animator creates a new AnimatorWidget.
 func Animator(a Animation) *AnimatorWidget {
 	result := &AnimatorWidget{
-		id:       giu.GenAutoID("Animation"),
-		a:        a,
-		duration: DefaultDuration,
-		fps:      DefaultFPS,
+		id:              giu.GenAutoID("Animation"),
+		a:               a,
+		duration:        DefaultDuration,
+		fps:             DefaultFPS,
+		easingAlgorithm: EasingAlgNone,
 	}
 
 	return result
@@ -46,6 +48,13 @@ func (a *AnimatorWidget) FPS(fps int) *AnimatorWidget {
 // CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
 func (a *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
 	a.duration = duration
+
+	return a
+}
+
+// EasingAlgorithm allows to specify easing algorithm
+func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidget {
+	a.easingAlgorithm = alg
 
 	return a
 }
@@ -92,7 +101,8 @@ func (a *AnimatorWidget) Build() {
 	}
 
 	if a.IsRunning() {
-		a.a.BuildAnimation(a.CurrentPercentageProgress(), a.Start)
+		p := a.CurrentPercentageProgress()
+		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, a.Start)
 
 		return
 	}

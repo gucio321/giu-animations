@@ -11,8 +11,17 @@ type Animation interface {
 	// starter is a link to Animator.Start
 	BuildNormal(starter func())
 	// BuildAnimation is called when running an animation.
-	// It receives the current animation progress as a float, where
-	// 0 >= animationPercentage <= 1
-	// starter is a link to Animator.Start
-	BuildAnimation(animationPercentage float32, starter func())
+	// It receives two values:
+	// - first one is animationPercentage after applying specified by Animator
+	//   easing algorithm.
+	//   ATTENTION: this value may be less than 0 or larger than 1
+	// - second value is arbitrary percentage progress before applying
+	//   easing algorithm.
+	//   it is always in range <0, 1> (0 <= arbitraryPercentage <= 1)
+	//   NOTE: this value should NOT be used in most cases, because it will
+	//   disable user from specifying Easing Algorithm and most use-cases
+	//   does not want this. Exceptions, I see for now may be:
+	// 	 - your animation does not accept negative (or larger than 1) progress values
+	// starter is a link to (*Animator).Start() method.
+	BuildAnimation(animationPercentage, arbitraryPercentage float32, starter func())
 }

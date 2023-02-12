@@ -1,6 +1,9 @@
 package animations
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 type EasingAlgorithm func(plainPercentage float32) (percentage float32)
 
@@ -24,6 +27,43 @@ const (
 	EasingAlgInOutBounce
 	EasingAlgMax
 )
+
+// Ease takes EasingAlgorithmType and plain percentage value t and returns eased value.
+// The following condition is expected to be met, however they are not restricted anyhow:
+// 0 <= t <= 1
+func Ease(alg EasingAlgorithmType, t float32) float32 {
+	switch alg {
+	case EasingAlgNone:
+		return t
+	case EasingAlgInSine:
+		return easingAlgInSine(t)
+	case EasingAlgOutSine:
+		return easingAlgOutSine(t)
+	case EasingAlgInOutSine:
+		return easingAlgInOutSine(t)
+	case EasingAlgInBack:
+		return easingAlgInBack(t)
+	case EasingAlgOutBack:
+		return easingAlgOutBack(t)
+	case EasingAlgInOutBack:
+		return easingAlgInOutBack(t)
+	case EasingAlgInElastic:
+		return easingAlgInElastic(t)
+	case EasingAlgOutElastic:
+		return easingAlgOutElastic(t)
+	case EasingAlgInOutElastic:
+		return easingAlgInOutElastic(t)
+	case EasingAlgInBounce:
+		return easingAlgInBounce(t)
+	case EasingAlgOutBounce:
+		return easingAlgOutBounce(t)
+	case EasingAlgInOutBounce:
+		return easingAlgInOutBounce(t)
+	}
+
+	log.Panicf("Unknown easing type %v", alg)
+	return -1 // unreachable
+}
 
 func easingAlgInSine(plainPercentage float32) float32 {
 	return 1 - float32(math.Cos((float64(plainPercentage)*math.Pi)/2))

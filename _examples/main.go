@@ -50,10 +50,9 @@ func loop() {
 								}),
 							).Size(200, 80)
 						}, imgui.Vec2{X: 20, Y: 100}).
-							Algorithm(easingAlg).
 							StartPos(imgui.Vec2{X: 5, Y: 80}).
 							Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
-					).Duration(time.Second*3).FPS(120),
+					).Duration(time.Second*3).FPS(120).EasingAlgorithm(easingAlg),
 				)
 			},
 			func(starter func()) {

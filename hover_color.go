@@ -109,7 +109,7 @@ func (h *HoverColorAnimation) BuildNormal(starter func()) {
 	data.m.Unlock()
 }
 
-func (h *HoverColorAnimation) BuildAnimation(percentage float32, _ func()) {
+func (h *HoverColorAnimation) BuildAnimation(percentage, _ float32, _ func()) {
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	hoverColor := giu.ToVec4Color(h.hoveredColor())
