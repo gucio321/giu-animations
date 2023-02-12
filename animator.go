@@ -8,7 +8,11 @@ import (
 )
 
 const (
-	DefaultFPS      = 60
+	// DefaultFPS is FPS value that should suit most use-cases.
+	// Animator takes this value by default and it could be changed by (*Animator).FPS()
+	DefaultFPS = 60
+	// DefaultDuration is animation's duration set by default.
+	// You can change this by (*Animator).Durations()
 	DefaultDuration = time.Second / 4
 )
 

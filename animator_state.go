@@ -20,6 +20,7 @@ type animatorState struct {
 	m *sync.Mutex
 }
 
+// Dispose implements giu.Disposable
 func (s *animatorState) Dispose() {
 	// noop
 }
@@ -66,6 +67,9 @@ func (a *AnimatorWidget) shouldInit() bool {
 	return s.shouldInit
 }
 
+// CurrentPercentageProgress returns a float value from range <0, 1>
+// representing current progress of an animation.
+// If animation is not running, it will return 0.
 func (a *AnimatorWidget) CurrentPercentageProgress() float32 {
 	if !a.IsRunning() {
 		return 0

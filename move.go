@@ -6,11 +6,14 @@ import (
 	"log"
 )
 
+var _ giu.Disposable = &moveAnimationState{}
+
 type moveAnimationState struct {
 	state    bool
 	startPos imgui.Vec2
 }
 
+// Dispose implements giu.Disposable
 func (m *moveAnimationState) Dispose() {
 	// noop
 }
@@ -36,6 +39,8 @@ func (m *MoveAnimation) newState() *moveAnimationState {
 
 var _ Animation = &MoveAnimation{}
 
+// MoveAnimation moves a widget from start position to destination.
+// You can also specify a Bézier curve's points.
 type MoveAnimation struct {
 	id string
 
@@ -46,6 +51,8 @@ type MoveAnimation struct {
 	bezier    []imgui.Vec2
 }
 
+// Move creates new *MoveAnimations
+// StartPos will be current cursor position
 func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
 	return &MoveAnimation{
 		id:       giu.GenAutoID("MoveAnimation"),
@@ -54,31 +61,32 @@ func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation
 	}
 }
 
+// StartPos allows to specify custom StartPos (item will be moved there immediately.
 func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
 	m.getState().startPos = startPos
 	return m
 }
 
+// Bezier allows to specify Bezier Curve points.
 func (m *MoveAnimation) Bezier(points ...imgui.Vec2) *MoveAnimation {
-	if len(points) > 2 {
-		points = points[:2]
-	}
-
 	m.useBezier = true
 	m.bezier = points
 
 	return m
 }
 
+// Init implements Animation
 func (m *MoveAnimation) Init() {
 	m.getState().startPos = imgui.CursorPos()
 }
 
+// Reset implements Animation
 func (m *MoveAnimation) Reset() {
 	state := m.getState()
 	state.state = !state.state
 }
 
+// BuildNormal implements Animation
 func (m *MoveAnimation) BuildNormal(starter func()) {
 	state := m.getState()
 	if state.state {
@@ -94,6 +102,7 @@ func (m *MoveAnimation) BuildNormal(starter func()) {
 	m.widget(starter).Build()
 }
 
+// BuildAnimation implements Animation
 func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, starter func()) {
 	state := m.getState()
 
