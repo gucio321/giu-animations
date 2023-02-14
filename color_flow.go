@@ -27,7 +27,7 @@ type ColorFlowAnimation struct {
 	giu.Widget
 	destinationColor,
 	normalColor func() color.RGBA
-	destID, normalID imgui.StyleColorID
+	applyingStyles []giu.StyleColorID
 }
 
 // ColorFlowStyle wraps ColorFlow so that it automatically obtains the color for specified style values.
@@ -50,15 +50,14 @@ func ColorFlowStyle(
 func ColorFlow(
 	widget giu.Widget,
 	destinationColor, normalColor func() color.RGBA,
-	destinationID, normalID giu.StyleColorID,
+	applying ...giu.StyleColorID,
 ) *ColorFlowAnimation {
 	return &ColorFlowAnimation{
 		id:               giu.GenAutoID("colorFlowAnimation"),
 		Widget:           widget,
 		destinationColor: destinationColor,
 		normalColor:      normalColor,
-		destID:           imgui.StyleColorID(destinationID),
-		normalID:         imgui.StyleColorID(normalID),
+		applyingStyles:   applying,
 	}
 }
 
@@ -84,16 +83,16 @@ func (h *ColorFlowAnimation) BuildNormal(starter func()) {
 		starter()
 	}
 
-	var normalColor imgui.Vec4
+	var normalColor color.Color
 
 	if shouldStart {
 		isTriggered = !isTriggered
 	}
 
 	if isTriggered {
-		normalColor = giu.ToVec4Color(h.destinationColor())
+		normalColor = h.destinationColor()
 	} else {
-		normalColor = giu.ToVec4Color(h.normalColor())
+		normalColor = h.normalColor()
 	}
 
 	if shouldStart {
@@ -128,19 +127,17 @@ func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ func()) {
 	normalColor.Y += (destinationColor.Y - normalColor.Y) * percentage
 	normalColor.Z += (destinationColor.Z - normalColor.Z) * percentage
 
-	h.build(normalColor)
+	h.build(giu.Vec4ToRGBA(normalColor))
 }
 
-func (h *ColorFlowAnimation) build(c imgui.Vec4) {
-	imgui.PushStyleColor(h.normalID, c)
-
-	if h.destID != h.normalID {
-		imgui.PushStyleColor(h.destID, c)
-		defer imgui.PopStyleColor()
+func (h *ColorFlowAnimation) build(c color.Color) {
+	for _, s := range h.applyingStyles {
+		giu.PushStyleColor(s, c)
 	}
 
+	defer giu.PopStyleColorV(len(h.applyingStyles))
+
 	h.Widget.Build()
-	imgui.PopStyleColor()
 }
 
 func (h *ColorFlowAnimation) getState() *colorFlowAnimationState {
