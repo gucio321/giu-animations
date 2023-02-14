@@ -16,6 +16,20 @@ const (
 	DefaultDuration = time.Second / 4
 )
 
+type TriggerFunc func() bool
+type TriggerType byte
+
+const (
+	// TriggerNever is a devault value.
+	// Animation will not be started automatically
+	TriggerNever TriggerType = iota
+	// TriggerOnTrue will start animation whenever trigger becomes true
+	TriggerOnTrue
+	// TriggerOnChange will trigger animation, when value of trigger's function
+	// will change
+	TriggerOnChange
+)
+
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
 	id string
@@ -23,6 +37,8 @@ type AnimatorWidget struct {
 	duration        time.Duration
 	fps             int
 	easingAlgorithm EasingAlgorithmType
+	triggerType     TriggerType
+	triggerFunc     TriggerFunc
 
 	a Animation
 }
@@ -63,6 +79,13 @@ func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidge
 	return a
 }
 
+func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *AnimatorWidget {
+	a.triggerType = triggerType
+	a.triggerFunc = f
+
+	return a
+}
+
 // Start starts the animation.
 func (a *AnimatorWidget) Start() {
 	a.a.Reset()
@@ -96,9 +119,9 @@ func (a *AnimatorWidget) Start() {
 
 // Build implements giu.Widget
 func (a *AnimatorWidget) Build() {
+	s := a.getState()
 	if a.shouldInit() {
 		a.a.Init()
-		s := a.getState()
 		s.m.Lock()
 		s.shouldInit = false
 		s.m.Unlock()
@@ -112,4 +135,24 @@ func (a *AnimatorWidget) Build() {
 	}
 
 	a.a.BuildNormal(a.Start)
+
+	if a.triggerFunc != nil {
+		triggerValue := a.triggerFunc()
+		switch a.triggerType {
+		case TriggerNever:
+			// noop
+		case TriggerOnTrue:
+			if triggerValue {
+				a.Start()
+			}
+		case TriggerOnChange:
+			s.m.Lock()
+			if s.triggerStatus != triggerValue {
+				a.Start()
+			}
+
+			s.triggerStatus = triggerValue
+			s.m.Unlock()
+		}
+	}
 }

@@ -17,6 +17,8 @@ type animatorState struct {
 	elapsed  time.Duration
 	duration time.Duration
 
+	triggerStatus bool
+
 	m *sync.Mutex
 }
 
