@@ -119,7 +119,7 @@ func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ func()) {
 	data.m.Lock()
 	data.m.Unlock()
 
-	if !isTriggered /*&& state.IsRunning()*/ {
+	if !isTriggered {
 		percentage = 1 - percentage
 	}
 
