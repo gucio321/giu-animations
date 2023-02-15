@@ -17,10 +17,10 @@ var _ Animation = &TransitionAnimation{}
 
 type TransitionAnimation struct {
 	id                   string
-	renderer1, renderer2 func(starter StarterFunc)
+	renderer1, renderer2 func(starter func())
 }
 
-func Transition(renderer1, renderer2 func(starter StarterFunc)) *TransitionAnimation {
+func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation {
 	return &TransitionAnimation{
 		id:        giu.GenAutoID("transitionAnimation"),
 		renderer1: renderer1,
@@ -36,10 +36,10 @@ func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, starter Star
 	}
 
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, percentage)
-	t.renderer1(starter)
+	t.renderer1(func() { starter(PlayAuto) })
 	imgui.PopStyleVar()
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, 1-percentage)
-	t.renderer2(starter)
+	t.renderer2(func() { starter(PlayAuto) })
 	imgui.PopStyleVar()
 }
 
@@ -60,9 +60,9 @@ func (t *TransitionAnimation) BuildNormal(starter StarterFunc) {
 	state := t.getState()
 
 	if state.layout == 0 {
-		t.renderer1(starter)
+		t.renderer1(func() { starter(PlayAuto) })
 	} else {
-		t.renderer2(starter)
+		t.renderer2(func() { starter(PlayAuto) })
 	}
 }
 

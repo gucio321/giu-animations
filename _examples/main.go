@@ -18,13 +18,13 @@ func loop() {
 	a := int32(easingAlg)
 	animations.Animator(
 		animations.Transition(
-			func(starter animations.StarterFunc) {
+			func(starter func()) {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
 					animations.Animator(
 						animations.ColorFlow(
 							giu.Button("start transition").OnClick(func() {
-								starter(animations.PlayForward)
+								starter()
 							}),
 							func() color.RGBA {
 								return colornames.Red
@@ -55,11 +55,11 @@ func loop() {
 					).Duration(time.Second*3).FPS(120).EasingAlgorithm(easingAlg).Trigger(animations.TriggerOnTrue, giu.IsItemHovered),
 				)
 			},
-			func(starter animations.StarterFunc) {
+			func(starter func()) {
 				giu.Window("window2").Layout(
 					giu.Label("I'm a window 1"),
 					giu.Button("start transition").OnClick(func() {
-						starter(animations.PlayForward)
+						starter()
 					}),
 				)
 			},
