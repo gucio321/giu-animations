@@ -87,21 +87,44 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 
 func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
+	{
+		state.m.Lock()
+		switch playMode {
+		case PlayForward:
+			state.elapsed = 0
+		case PlayBackwards:
+			state.elapsed = state.duration
+		}
+		state.m.Unlock()
+	}
+
 	tickDuration := time.Second / time.Duration(a.fps)
 	for range time.Tick(tickDuration) {
-		if state.elapsed > state.duration {
-			state.m.Lock()
-			state.isRunning = false
-			state.elapsed = 0
-			state.m.Unlock()
+		giu.Update()
+		state.m.Lock()
+		switch playMode {
+		case PlayForward:
+			if state.elapsed >= state.duration {
+				state.isRunning = false
+				state.elapsed = 0
+				state.m.Unlock()
 
-			return
+				return
+			}
+
+			state.elapsed += tickDuration
+		case PlayBackwards:
+			if state.elapsed <= 0 {
+				state.isRunning = false
+				state.elapsed = 0
+				state.m.Unlock()
+
+				return
+			}
+
+			state.elapsed -= tickDuration
 		}
 
-		giu.Update()
-
-		state.m.Lock()
-		state.elapsed += tickDuration
 		state.m.Unlock()
 	}
 }
