@@ -16,13 +16,6 @@ const (
 	DefaultDuration = time.Second / 4
 )
 
-type PlayMode bool
-
-const (
-	PlayForward  PlayMode = true
-	PlayBackword PlayMode = false
-)
-
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
 	id string
@@ -147,7 +140,7 @@ func (a *AnimatorWidget) Build() {
 				if triggerValue {
 					a.Start(PlayForward)
 				} else {
-					a.Start(PlayBackword)
+					a.Start(PlayBackwards)
 				}
 			}
 
