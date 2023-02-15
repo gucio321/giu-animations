@@ -16,6 +16,13 @@ const (
 	DefaultDuration = time.Second / 4
 )
 
+type PlayMode bool
+
+const (
+	PlayForward  PlayMode = true
+	PlayBackword PlayMode = false
+)
+
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
 	id string
@@ -73,7 +80,7 @@ func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *Animat
 }
 
 // Start starts the animation.
-func (a *AnimatorWidget) Start() {
+func (a *AnimatorWidget) Start(playMode PlayMode) {
 	a.a.Reset()
 	state := a.getState()
 
@@ -82,25 +89,28 @@ func (a *AnimatorWidget) Start() {
 	state.duration = a.duration
 	state.m.Unlock()
 
-	go func() {
-		tickDuration := time.Second / time.Duration(a.fps)
-		for range time.Tick(tickDuration) {
-			if state.elapsed > state.duration {
-				state.m.Lock()
-				state.isRunning = false
-				state.elapsed = 0
-				state.m.Unlock()
+	go a.playAnimation(playMode)
+}
 
-				return
-			}
-
-			giu.Update()
-
+func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
+	state := a.getState()
+	tickDuration := time.Second / time.Duration(a.fps)
+	for range time.Tick(tickDuration) {
+		if state.elapsed > state.duration {
 			state.m.Lock()
-			state.elapsed += tickDuration
+			state.isRunning = false
+			state.elapsed = 0
 			state.m.Unlock()
+
+			return
 		}
-	}()
+
+		giu.Update()
+
+		state.m.Lock()
+		state.elapsed += tickDuration
+		state.m.Unlock()
+	}
 }
 
 // Build implements giu.Widget
@@ -129,12 +139,16 @@ func (a *AnimatorWidget) Build() {
 			// noop
 		case TriggerOnTrue:
 			if triggerValue {
-				a.Start()
+				a.Start(PlayForward)
 			}
 		case TriggerOnChange:
 			s.m.Lock()
 			if s.triggerStatus != triggerValue {
-				a.Start()
+				if triggerValue {
+					a.Start(PlayForward)
+				} else {
+					a.Start(PlayBackword)
+				}
 			}
 
 			s.triggerStatus = triggerValue

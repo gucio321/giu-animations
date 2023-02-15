@@ -69,7 +69,7 @@ func (h *ColorFlowAnimation) Init() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) BuildNormal(starter func()) {
+func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
 	data := h.getState()
 	data.m.Lock()
 	shouldStart := data.shouldStart
@@ -80,7 +80,7 @@ func (h *ColorFlowAnimation) BuildNormal(starter func()) {
 		data.m.Lock()
 		data.shouldStart = false
 		data.m.Unlock()
-		starter()
+		starter(PlayForward)
 	}
 
 	var normalColor color.Color
@@ -108,7 +108,7 @@ func (h *ColorFlowAnimation) BuildNormal(starter func()) {
 	data.m.Unlock()
 }
 
-func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ func()) {
+func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ StarterFunc) {
 	data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	destinationColor := giu.ToVec4Color(h.destinationColor())

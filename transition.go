@@ -17,10 +17,10 @@ var _ Animation = &TransitionAnimation{}
 
 type TransitionAnimation struct {
 	id                   string
-	renderer1, renderer2 func(starter func())
+	renderer1, renderer2 func(starter StarterFunc)
 }
 
-func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation {
+func Transition(renderer1, renderer2 func(starter StarterFunc)) *TransitionAnimation {
 	return &TransitionAnimation{
 		id:        giu.GenAutoID("transitionAnimation"),
 		renderer1: renderer1,
@@ -28,7 +28,7 @@ func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation 
 	}
 }
 
-func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, starter func()) {
+func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, starter StarterFunc) {
 	state := t.getState()
 	// it means the current layout is layout1, so increasing percentage
 	if state.layout == 1 {
@@ -56,7 +56,7 @@ func (t *TransitionAnimation) Init() {
 	// noop
 }
 
-func (t *TransitionAnimation) BuildNormal(starter func()) {
+func (t *TransitionAnimation) BuildNormal(starter StarterFunc) {
 	state := t.getState()
 
 	if state.layout == 0 {

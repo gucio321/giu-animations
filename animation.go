@@ -1,5 +1,7 @@
 package animations
 
+type StarterFunc func(playMode PlayMode)
+
 // Animation is an interface implemented by each animation.
 type Animation interface {
 	// Init is called once, immediately on start.
@@ -9,7 +11,7 @@ type Animation interface {
 
 	// BuildNormal is called every frame when animation is not running
 	// starter is a link to Animator.Start
-	BuildNormal(starter func())
+	BuildNormal(starterFunc StarterFunc)
 	// BuildAnimation is called when running an animation.
 	// It receives two values:
 	// - first one is animationPercentage after applying specified by Animator
@@ -23,5 +25,5 @@ type Animation interface {
 	//   does not want this. Exceptions, I see for now may be:
 	// 	 - your animation does not accept negative (or larger than 1) progress values
 	// starter is a link to (*Animator).Start() method.
-	BuildAnimation(animationPercentage, arbitraryPercentage float32, starter func())
+	BuildAnimation(animationPercentage, arbitraryPercentage float32, starterFunc StarterFunc)
 }

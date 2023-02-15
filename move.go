@@ -44,7 +44,7 @@ var _ Animation = &MoveAnimation{}
 type MoveAnimation struct {
 	id string
 
-	widget   func(starter func()) giu.Widget
+	widget   func(starter StarterFunc) giu.Widget
 	posDelta imgui.Vec2
 
 	useBezier bool
@@ -53,7 +53,7 @@ type MoveAnimation struct {
 
 // Move creates new *MoveAnimations
 // StartPos will be current cursor position
-func Move(w func(starter func()) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
+func Move(w func(starter StarterFunc) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
 	return &MoveAnimation{
 		id:       giu.GenAutoID("MoveAnimation"),
 		widget:   w,
@@ -87,7 +87,7 @@ func (m *MoveAnimation) Reset() {
 }
 
 // BuildNormal implements Animation
-func (m *MoveAnimation) BuildNormal(starter func()) {
+func (m *MoveAnimation) BuildNormal(starter StarterFunc) {
 	state := m.getState()
 	if state.state {
 		p := imgui.Vec2{
@@ -103,7 +103,7 @@ func (m *MoveAnimation) BuildNormal(starter func()) {
 }
 
 // BuildAnimation implements Animation
-func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, starter func()) {
+func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, starter StarterFunc) {
 	state := m.getState()
 
 	if !state.state {

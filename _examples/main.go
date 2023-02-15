@@ -18,13 +18,13 @@ func loop() {
 	a := int32(easingAlg)
 	animations.Animator(
 		animations.Transition(
-			func(starter func()) {
+			func(starter animations.StarterFunc) {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
 					animations.Animator(
 						animations.ColorFlow(
 							giu.Button("start transition").OnClick(func() {
-								starter()
+								starter(animations.PlayForward)
 							}),
 							func() color.RGBA {
 								return colornames.Red
@@ -37,7 +37,7 @@ func loop() {
 						),
 					).Duration(time.Second).FPS(60),
 					animations.Animator(
-						animations.Move(func(starter func()) giu.Widget {
+						animations.Move(func(starter animations.StarterFunc) giu.Widget {
 							return giu.Child().Layout(
 								giu.Row(
 									giu.Label("Set easing alg:"),
@@ -46,7 +46,7 @@ func loop() {
 									}),
 								),
 								giu.Button("move me!").OnClick(func() {
-									starter()
+									starter(animations.PlayForward)
 								}),
 							).Size(200, 80)
 						}, imgui.Vec2{X: 20, Y: 100}).
@@ -55,11 +55,11 @@ func loop() {
 					).Duration(time.Second*3).FPS(120).EasingAlgorithm(easingAlg).Trigger(animations.TriggerOnTrue, giu.IsItemHovered),
 				)
 			},
-			func(starter func()) {
+			func(starter animations.StarterFunc) {
 				giu.Window("window2").Layout(
 					giu.Label("I'm a window 1"),
 					giu.Button("start transition").OnClick(func() {
-						starter()
+						starter(animations.PlayForward)
 					}),
 				)
 			},
