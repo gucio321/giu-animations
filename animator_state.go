@@ -19,7 +19,8 @@ type animatorState struct {
 
 	triggerStatus bool
 
-	m *sync.Mutex
+	reset chan bool
+	m     *sync.Mutex
 }
 
 // Dispose implements giu.Disposable
@@ -31,6 +32,7 @@ func (a *AnimatorWidget) newState() *animatorState {
 	return &animatorState{
 		shouldInit: true,
 		m:          &sync.Mutex{},
+		reset:      make(chan bool),
 	}
 }
 

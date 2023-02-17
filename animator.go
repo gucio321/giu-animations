@@ -78,8 +78,14 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	state := a.getState()
 
 	state.m.Lock()
+
+	if state.isRunning {
+		state.reset <- true
+	}
+
 	state.isRunning = true
 	state.duration = a.duration
+
 	state.m.Unlock()
 
 	go a.playAnimation(playMode)
@@ -87,45 +93,51 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 
 func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
-	{
-		state.m.Lock()
-		switch playMode {
-		case PlayForward:
-			state.elapsed = 0
-		case PlayBackwards:
-			state.elapsed = state.duration
-		}
-		state.m.Unlock()
+	state.m.Lock()
+
+	switch playMode {
+	case PlayForward:
+		state.elapsed = 0
+	case PlayBackwards:
+		state.elapsed = state.duration
 	}
 
+	resetChan := state.reset
+	state.m.Unlock()
+
 	tickDuration := time.Second / time.Duration(a.fps)
-	for range time.Tick(tickDuration) {
-		giu.Update()
-		state.m.Lock()
-		switch playMode {
-		case PlayForward:
-			if state.elapsed >= state.duration {
-				state.isRunning = false
-				state.elapsed = 0
-				state.m.Unlock()
+	for {
+		select {
+		case <-time.Tick(tickDuration):
+			giu.Update()
+			state.m.Lock()
+			switch playMode {
+			case PlayForward:
+				if state.elapsed >= state.duration {
+					state.isRunning = false
+					state.elapsed = 0
+					state.m.Unlock()
 
-				return
+					return
+				}
+
+				state.elapsed += tickDuration
+			case PlayBackwards:
+				if state.elapsed <= 0 {
+					state.isRunning = false
+					state.elapsed = 0
+					state.m.Unlock()
+
+					return
+				}
+
+				state.elapsed -= tickDuration
 			}
 
-			state.elapsed += tickDuration
-		case PlayBackwards:
-			if state.elapsed <= 0 {
-				state.isRunning = false
-				state.elapsed = 0
-				state.m.Unlock()
-
-				return
-			}
-
-			state.elapsed -= tickDuration
+			state.m.Unlock()
+		case <-resetChan:
+			return
 		}
-
-		state.m.Unlock()
 	}
 }
 

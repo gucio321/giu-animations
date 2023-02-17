@@ -20,3 +20,5 @@ require (
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 )
+
+replace github.com/AllenDang/giu => github.com/gucio321/giu v0.6.3-0.20230216184243-00bc8eae4793

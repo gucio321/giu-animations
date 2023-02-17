@@ -2,6 +2,7 @@ package animations
 
 import (
 	"log"
+	"sync"
 
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
@@ -9,6 +10,7 @@ import (
 
 type transitionAnimationState struct {
 	layout int
+	m      *sync.Mutex
 }
 
 func (s *transitionAnimationState) Dispose() {}
@@ -45,11 +47,15 @@ func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, starter Star
 
 func (t *TransitionAnimation) Reset() {
 	state := t.getState()
+	state.m.Lock()
+
 	if state.layout == 0 {
 		state.layout = 1
 	} else {
 		state.layout = 0
 	}
+
+	state.m.Unlock()
 }
 
 func (t *TransitionAnimation) Init() {
@@ -82,5 +88,7 @@ func (t *TransitionAnimation) getState() *transitionAnimationState {
 }
 
 func (t *TransitionAnimation) newState() *transitionAnimationState {
-	return &transitionAnimationState{}
+	return &transitionAnimationState{
+		m: &sync.Mutex{},
+	}
 }
