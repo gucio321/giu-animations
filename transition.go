@@ -65,7 +65,11 @@ func (t *TransitionAnimation) Init() {
 func (t *TransitionAnimation) BuildNormal(starter StarterFunc) {
 	state := t.getState()
 
-	if state.layout == 0 {
+	state.m.Lock()
+	layout := state.layout
+	state.m.Unlock()
+
+	if layout == 0 {
 		t.renderer1(func() { starter(PlayAuto) })
 	} else {
 		t.renderer2(func() { starter(PlayAuto) })
