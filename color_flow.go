@@ -10,9 +10,8 @@ import (
 )
 
 type colorFlowAnimationState struct {
-	isTriggered bool
-	shouldStart bool
-	m           *sync.Mutex
+	state bool
+	m     *sync.Mutex
 }
 
 func (s *colorFlowAnimationState) Dispose() {
@@ -62,7 +61,8 @@ func ColorFlow(
 }
 
 func (h *ColorFlowAnimation) Reset() {
-	// noop
+	data := h.getState()
+	data.state = !data.state
 }
 
 func (h *ColorFlowAnimation) Init() {
@@ -71,61 +71,31 @@ func (h *ColorFlowAnimation) Init() {
 
 func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
 	data := h.getState()
-	data.m.Lock()
-	shouldStart := data.shouldStart
-	isTriggered := data.isTriggered
-	data.m.Unlock()
-
-	if shouldStart {
-		data.m.Lock()
-		data.shouldStart = false
-		data.m.Unlock()
-		starter(PlayForward)
-	}
 
 	var normalColor color.Color
 
-	if shouldStart {
-		isTriggered = !isTriggered
-	}
-
-	if isTriggered {
+	if data.state {
 		normalColor = h.destinationColor()
 	} else {
 		normalColor = h.normalColor()
 	}
 
-	if shouldStart {
-		isTriggered = !isTriggered
-	}
-
 	h.build(normalColor)
-	isTriggeredNow := imgui.IsItemHovered()
-
-	data.m.Lock()
-	data.shouldStart = isTriggeredNow != isTriggered
-	data.isTriggered = isTriggeredNow
-	data.m.Unlock()
 }
 
 func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ StarterFunc) {
-	data := h.getState()
+	// need to call this method here to prevent state from being disposed.
+	_ = h.getState()
+
 	normalColor := giu.ToVec4Color(h.normalColor())
 	destinationColor := giu.ToVec4Color(h.destinationColor())
-	data.m.Lock()
-	isTriggered := data.isTriggered
-	data.m.Unlock()
-
-	data.m.Lock()
-	data.m.Unlock()
-
-	if !isTriggered {
-		percentage = 1 - percentage
-	}
 
 	normalColor.X += (destinationColor.X - normalColor.X) * percentage
+	normalColor.X = clamp01(normalColor.X)
 	normalColor.Y += (destinationColor.Y - normalColor.Y) * percentage
+	normalColor.Y = clamp01(normalColor.Y)
 	normalColor.Z += (destinationColor.Z - normalColor.Z) * percentage
+	normalColor.Z = clamp01(normalColor.Z)
 
 	h.build(giu.Vec4ToRGBA(normalColor))
 }
@@ -159,4 +129,14 @@ func (h *ColorFlowAnimation) newState() *colorFlowAnimationState {
 	return &colorFlowAnimationState{
 		m: &sync.Mutex{},
 	}
+}
+
+func clamp01(val float32) float32 {
+	if val <= 0 {
+		return 0
+	} else if val >= 1 {
+		return 1
+	}
+
+	return val
 }

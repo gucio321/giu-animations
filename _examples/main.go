@@ -35,7 +35,10 @@ func loop() {
 							giu.StyleColorButtonHovered,
 							giu.StyleColorButton,
 						),
-					).Duration(time.Second).FPS(60),
+					).
+						Duration(time.Second).
+						FPS(60).
+						Trigger(animations.TriggerOnChange, imgui.IsItemHovered),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
 							return giu.Child().Layout(
