@@ -114,8 +114,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 			switch playMode {
 			case PlayForward:
 				if state.elapsed >= state.duration {
-					state.isRunning = false
-					state.elapsed = 0
+					a.stopAnimation(state)
 					state.m.Unlock()
 
 					return
@@ -124,8 +123,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 				state.elapsed += tickDuration
 			case PlayBackwards:
 				if state.elapsed <= 0 {
-					state.isRunning = false
-					state.elapsed = 0
+					a.stopAnimation(state)
 					state.m.Unlock()
 
 					return
@@ -139,6 +137,15 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 			return
 		}
 	}
+}
+
+func (a *AnimatorWidget) stopAnimation(state *animatorState) {
+	state.isRunning = false
+	state.elapsed = 0
+
+	// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)
+	// This is important mainly because of triggers that might have to be run.
+	giu.Update()
 }
 
 // Build implements giu.Widget
