@@ -10,9 +10,8 @@ import (
 )
 
 type colorFlowAnimationState struct {
-	isTriggered bool
-	shouldStart bool
-	m           *sync.Mutex
+	state bool
+	m     *sync.Mutex
 }
 
 func (s *colorFlowAnimationState) Dispose() {
@@ -71,57 +70,22 @@ func (h *ColorFlowAnimation) Init() {
 
 func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
 	data := h.getState()
-	data.m.Lock()
-	shouldStart := data.shouldStart
-	isTriggered := data.isTriggered
-	data.m.Unlock()
-
-	if shouldStart {
-		data.m.Lock()
-		data.shouldStart = false
-		data.m.Unlock()
-		starter(PlayForward)
-	}
 
 	var normalColor color.Color
 
-	if shouldStart {
-		isTriggered = !isTriggered
-	}
-
-	if isTriggered {
+	if data.state {
 		normalColor = h.destinationColor()
 	} else {
 		normalColor = h.normalColor()
 	}
 
-	if shouldStart {
-		isTriggered = !isTriggered
-	}
-
 	h.build(normalColor)
-	isTriggeredNow := imgui.IsItemHovered()
-
-	data.m.Lock()
-	data.shouldStart = isTriggeredNow != isTriggered
-	data.isTriggered = isTriggeredNow
-	data.m.Unlock()
 }
 
 func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ StarterFunc) {
-	data := h.getState()
+	//data := h.getState()
 	normalColor := giu.ToVec4Color(h.normalColor())
 	destinationColor := giu.ToVec4Color(h.destinationColor())
-	data.m.Lock()
-	isTriggered := data.isTriggered
-	data.m.Unlock()
-
-	data.m.Lock()
-	data.m.Unlock()
-
-	if !isTriggered {
-		percentage = 1 - percentage
-	}
 
 	normalColor.X += (destinationColor.X - normalColor.X) * percentage
 	normalColor.Y += (destinationColor.Y - normalColor.Y) * percentage
