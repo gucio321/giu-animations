@@ -2,7 +2,6 @@
 package animations
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/AllenDang/giu"
@@ -79,7 +78,6 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	state := a.getState()
 
 	state.m.Lock()
-	fmt.Println("starting")
 
 	if state.isRunning {
 		state.reset <- true
@@ -119,8 +117,6 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					state.isRunning = false
 					state.elapsed = 0
 					state.m.Unlock()
-
-					giu.Update()
 
 					return
 				}
