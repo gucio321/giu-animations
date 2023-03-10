@@ -12,7 +12,10 @@ import (
 	animations "github.com/gucio321/giu-animations"
 )
 
-var easingAlg = animations.EasingAlgNone
+var (
+	easingAlg   = animations.EasingAlgNone
+	playOnHover bool
+)
 
 func loop() {
 	a := int32(easingAlg)
@@ -39,6 +42,7 @@ func loop() {
 						Duration(time.Second).
 						FPS(60).
 						Trigger(animations.TriggerOnChange, imgui.IsItemHovered),
+					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
 							return giu.Child().Layout(
@@ -53,9 +57,13 @@ func loop() {
 								}),
 							).Size(200, 80)
 						}, imgui.Vec2{X: 20, Y: 100}).
-							StartPos(imgui.Vec2{X: 5, Y: 80}).
 							Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
-					).Duration(time.Second*3).FPS(120).EasingAlgorithm(easingAlg).Trigger(animations.TriggerOnTrue, giu.IsItemHovered),
+					).Duration(time.Second*3).
+						FPS(120).
+						EasingAlgorithm(easingAlg).
+						Trigger(animations.TriggerOnTrue, func() bool {
+							return playOnHover && giu.IsItemHovered()
+						}),
 				)
 			},
 			func(starter func()) {
