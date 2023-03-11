@@ -9,9 +9,13 @@ type Animation interface {
 	// Reset is called whenever needs to restart animation.
 	Reset()
 
+	// KeyFrames is used mainly by the AnimatorWidget.
+	// It returns a number of key frames.
+	KeyFrames() int
+
 	// BuildNormal is called every frame when animation is not running
 	// starter is a link to Animator.Start
-	BuildNormal(starterFunc StarterFunc)
+	BuildNormal(currentKeyFrame KeyFrame, starterFunc StarterFunc)
 	// BuildAnimation is called when running an animation.
 	// It receives two values:
 	// - first one is animationPercentage after applying specified by Animator
@@ -25,5 +29,5 @@ type Animation interface {
 	//   does not want this. Exceptions, I see for now may be:
 	// 	 - your animation does not accept negative (or larger than 1) progress values
 	// starter is a link to (*Animator).Start() method.
-	BuildAnimation(animationPercentage, arbitraryPercentage float32, starterFunc StarterFunc)
+	BuildAnimation(animationPercentage, arbitraryPercentage float32, baseKeyFrame, destinationKeyFrame KeyFrame, starterFunc StarterFunc)
 }

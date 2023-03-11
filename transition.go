@@ -30,7 +30,11 @@ func Transition(renderer1, renderer2 func(starter func())) *TransitionAnimation 
 	}
 }
 
-func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, starter StarterFunc) {
+func (t *TransitionAnimation) KeyFrames() int {
+	return 2
+}
+
+func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, _, _ KeyFrame, starter StarterFunc) {
 	state := t.getState()
 	// it means the current layout is layout1, so increasing percentage
 	if state.layout == 1 {
@@ -62,7 +66,7 @@ func (t *TransitionAnimation) Init() {
 	// noop
 }
 
-func (t *TransitionAnimation) BuildNormal(starter StarterFunc) {
+func (t *TransitionAnimation) BuildNormal(_ KeyFrame, starter StarterFunc) {
 	state := t.getState()
 
 	state.m.Lock()

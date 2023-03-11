@@ -162,12 +162,14 @@ func (a *AnimatorWidget) Build() {
 
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, a.Start)
+		// TODO: implement key frames
+		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, 0, 0, a.Start)
 
 		return
 	}
 
-	a.a.BuildNormal(a.Start)
+	// TODO: implement key frames
+	a.a.BuildNormal(0, a.Start)
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()

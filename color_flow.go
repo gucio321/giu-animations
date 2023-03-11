@@ -69,7 +69,12 @@ func (h *ColorFlowAnimation) Init() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
+func (h *ColorFlowAnimation) KeyFrames() int {
+	// TODO: implement key frames mechanism here
+	return 2
+}
+
+func (h *ColorFlowAnimation) BuildNormal(_ KeyFrame, _ StarterFunc) {
 	data := h.getState()
 
 	var normalColor color.Color
@@ -83,7 +88,7 @@ func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
 	h.build(normalColor)
 }
 
-func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ StarterFunc) {
+func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _, _ KeyFrame, _ StarterFunc) {
 	// need to call this method here to prevent state from being disposed.
 	_ = h.getState()
 

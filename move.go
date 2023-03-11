@@ -61,7 +61,7 @@ func Move(w func(starter StarterFunc) giu.Widget, posDelta imgui.Vec2) *MoveAnim
 	}
 }
 
-// StartPos allows to specify custom StartPos (item will be moved there immediately.
+// StartPos allows to specify custom StartPos (item will be moved there immediately).
 func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
 	m.getState().startPos = startPos
 	return m
@@ -86,8 +86,13 @@ func (m *MoveAnimation) Reset() {
 	state.state = !state.state
 }
 
+func (m *MoveAnimation) KeyFrames() int {
+	// TODO: implement key frames mechanism here
+	return 2
+}
+
 // BuildNormal implements Animation
-func (m *MoveAnimation) BuildNormal(starter StarterFunc) {
+func (m *MoveAnimation) BuildNormal(_ KeyFrame, starter StarterFunc) {
 	state := m.getState()
 	if state.state {
 		p := imgui.Vec2{
@@ -103,7 +108,7 @@ func (m *MoveAnimation) BuildNormal(starter StarterFunc) {
 }
 
 // BuildAnimation implements Animation
-func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, starter StarterFunc) {
+func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, _, _ KeyFrame, starter StarterFunc) {
 	state := m.getState()
 
 	if !state.state {
