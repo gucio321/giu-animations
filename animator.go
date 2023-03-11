@@ -76,6 +76,21 @@ func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *Animat
 
 // Start starts the animation.
 func (a *AnimatorWidget) Start(playMode PlayMode) {
+	// TODO: set state here
+	a.start(playMode)
+}
+
+func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMode PlayMode) {
+	// TODO: set state here
+	a.start(playMode)
+}
+
+func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
+	// TODO: set state here
+	a.start(playMode)
+}
+
+func (a *AnimatorWidget) start(playMode PlayMode) {
 	a.a.Reset()
 	state := a.getState()
 
