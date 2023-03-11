@@ -25,8 +25,9 @@ type AnimatorWidget struct {
 
 	easingAlgorithm EasingAlgorithmType
 
-	triggerType TriggerType
-	triggerFunc TriggerFunc
+	triggerType    TriggerType
+	triggerPlyMode PlayMode
+	triggerFunc    TriggerFunc
 
 	numKeyFrames int
 
@@ -70,8 +71,9 @@ func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidge
 	return a
 }
 
-func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *AnimatorWidget {
+func (a *AnimatorWidget) Trigger(triggerType TriggerType, playMode PlayMode, f TriggerFunc) *AnimatorWidget {
 	a.triggerType = triggerType
+	a.triggerPlyMode = playMode
 	a.triggerFunc = f
 
 	return a
@@ -237,7 +239,7 @@ func (a *AnimatorWidget) Build() {
 			// noop
 		case TriggerOnTrue:
 			if triggerValue {
-				a.Start(PlayForward)
+				a.Start(a.triggerPlyMode)
 			}
 		case TriggerOnChange:
 			s.m.Lock()
@@ -245,7 +247,7 @@ func (a *AnimatorWidget) Build() {
 			s.m.Unlock()
 
 			if triggerStatus != triggerValue {
-				a.Start(PlayForward)
+				a.Start(a.triggerPlyMode)
 			}
 
 			s.m.Lock()

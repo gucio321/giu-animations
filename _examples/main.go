@@ -1,6 +1,8 @@
 package main
 
 import (
+	"golang.org/x/image/colornames"
+	"image/color"
 	"time"
 
 	"github.com/AllenDang/giu"
@@ -21,24 +23,24 @@ func loop() {
 			func(starter func()) {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
-					//animations.Animator(
-					//	animations.ColorFlow(
-					giu.Button("start transition").OnClick(func() {
-						starter()
-					}),
-					//func() color.RGBA {
-					//	return colornames.Red
-					//},
-					//func() color.RGBA {
-					//	return colornames.Blue
-					//},
-					//giu.StyleColorButtonHovered,
-					//giu.StyleColorButton,
-					//),
-					//).
-					//	Duration(time.Second).
-					//	FPS(60).
-					//	Trigger(animations.TriggerOnChange, imgui.IsItemHovered),
+					animations.Animator(
+						animations.ColorFlow(
+							giu.Button("start transition").OnClick(func() {
+								starter()
+							}),
+							func() color.RGBA {
+								return colornames.Red
+							},
+							func() color.RGBA {
+								return colornames.Blue
+							},
+							giu.StyleColorButtonHovered,
+							giu.StyleColorButton,
+						),
+					).
+						Duration(time.Second).
+						FPS(60).
+						Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
 					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
@@ -58,7 +60,7 @@ func loop() {
 					).Duration(time.Second*3).
 						FPS(120).
 						EasingAlgorithm(easingAlg).
-						Trigger(animations.TriggerOnTrue, func() bool {
+						Trigger(animations.TriggerOnTrue, animations.PlayForward, func() bool {
 							return playOnHover && giu.IsItemHovered()
 						}),
 				)
