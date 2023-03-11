@@ -155,7 +155,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					a.stopAnimation(state)
 					state.m.Unlock()
 
-					return
+					break
 				}
 
 				state.elapsed += tickDuration
@@ -164,7 +164,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					a.stopAnimation(state)
 					state.m.Unlock()
 
-					return
+					break
 				}
 
 				state.elapsed -= tickDuration
