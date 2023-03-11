@@ -1,10 +1,7 @@
 package main
 
 import (
-	"image/color"
 	"time"
-
-	"golang.org/x/image/colornames"
 
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
@@ -24,24 +21,24 @@ func loop() {
 			func(starter func()) {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
-					animations.Animator(
-						animations.ColorFlow(
-							giu.Button("start transition").OnClick(func() {
-								starter()
-							}),
-							func() color.RGBA {
-								return colornames.Red
-							},
-							func() color.RGBA {
-								return colornames.Blue
-							},
-							giu.StyleColorButtonHovered,
-							giu.StyleColorButton,
-						),
-					).
-						Duration(time.Second).
-						FPS(60).
-						Trigger(animations.TriggerOnChange, imgui.IsItemHovered),
+					//animations.Animator(
+					//	animations.ColorFlow(
+					giu.Button("start transition").OnClick(func() {
+						starter()
+					}),
+					//func() color.RGBA {
+					//	return colornames.Red
+					//},
+					//func() color.RGBA {
+					//	return colornames.Blue
+					//},
+					//giu.StyleColorButtonHovered,
+					//giu.StyleColorButton,
+					//),
+					//).
+					//	Duration(time.Second).
+					//	FPS(60).
+					//	Trigger(animations.TriggerOnChange, imgui.IsItemHovered),
 					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
@@ -68,7 +65,15 @@ func loop() {
 			},
 			func(starter func()) {
 				giu.Window("window2").Layout(
-					giu.Label("I'm a window 1"),
+					giu.Label("I'm a window 2"),
+					giu.Button("start transition").OnClick(func() {
+						starter()
+					}),
+				)
+			},
+			func(starter func()) {
+				giu.Window("window 3").Layout(
+					giu.Label("I'm third window!"),
 					giu.Button("start transition").OnClick(func() {
 						starter()
 					}),

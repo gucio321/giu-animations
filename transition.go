@@ -17,7 +17,7 @@ func Transition(renderers ...func(starter func())) *TransitionAnimation {
 }
 
 func (t *TransitionAnimation) KeyFrames() int {
-	return 2
+	return len(t.renderers)
 }
 
 func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, bf, df KeyFrame, starter StarterFunc) {

@@ -245,11 +245,7 @@ func (a *AnimatorWidget) Build() {
 			s.m.Unlock()
 
 			if triggerStatus != triggerValue {
-				if triggerValue {
-					a.Start(PlayForward)
-				} else {
-					a.Start(PlayBackwards)
-				}
+				a.Start(PlayForward)
 			}
 
 			s.m.Lock()
