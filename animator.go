@@ -96,6 +96,12 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 	state.m.Lock()
 	state.currentKeyFrame = beginKF
 	state.longTimeDestinationKeyFrame = destinationKF
+	switch playMode {
+	case PlayForward:
+		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, 1)
+	case PlayBackwards:
+		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, -1)
+	}
 	state.m.Unlock()
 
 	a.start(playMode)
