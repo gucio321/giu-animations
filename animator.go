@@ -28,6 +28,8 @@ type AnimatorWidget struct {
 	triggerType TriggerType
 	triggerFunc TriggerFunc
 
+	numKeyFrames int
+
 	a Animation
 }
 
@@ -39,6 +41,7 @@ func Animator(a Animation) *AnimatorWidget {
 		duration:        DefaultDuration,
 		fps:             DefaultFPS,
 		easingAlgorithm: EasingAlgNone,
+		numKeyFrames:    a.KeyFrames(),
 	}
 
 	return result
@@ -76,18 +79,36 @@ func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *Animat
 
 // Start starts the animation.
 func (a *AnimatorWidget) Start(playMode PlayMode) {
-	// TODO: set state here
-	a.start(playMode)
+	state := a.getState()
+	state.m.Lock()
+	cf := state.currentKeyFrame
+	state.m.Unlock()
+	delta := 1
+	if playMode == PlayBackwards {
+		delta = -1
+	}
+
+	a.StartKeyFrames(cf, getWithDelta(cf, a.numKeyFrames, delta), playMode)
 }
 
 func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMode PlayMode) {
-	// TODO: set state here
+	state := a.getState()
+	state.m.Lock()
+	state.currentKeyFrame = beginKF
+	state.destinationKeyFrame = destinationKF
+	state.m.Unlock()
+
 	a.start(playMode)
 }
 
 func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 	// TODO: set state here
-	a.start(playMode)
+	var begin, end = 0, a.numKeyFrames - 1
+	if playMode == PlayBackwards {
+		begin, end = end, begin
+	}
+
+	a.StartKeyFrames(KeyFrame(begin), KeyFrame(end), playMode)
 }
 
 func (a *AnimatorWidget) start(playMode PlayMode) {
