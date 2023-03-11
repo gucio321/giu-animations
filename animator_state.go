@@ -20,6 +20,7 @@ type animatorState struct {
 	triggerStatus bool
 
 	currentKeyFrame,
+	longTimeDestinationKeyFrame,
 	destinationKeyFrame KeyFrame
 
 	reset chan bool

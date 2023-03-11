@@ -95,7 +95,7 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 	state := a.getState()
 	state.m.Lock()
 	state.currentKeyFrame = beginKF
-	state.destinationKeyFrame = destinationKF
+	state.longTimeDestinationKeyFrame = destinationKF
 	state.m.Unlock()
 
 	a.start(playMode)
@@ -146,7 +146,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	tickDuration := time.Second / time.Duration(a.fps)
 	for {
 		state.m.Lock()
-		if state.currentKeyFrame == state.destinationKeyFrame {
+		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
 			state.m.Unlock()
 			break
 		}
@@ -164,6 +164,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					if state.elapsed >= state.duration {
 						a.stopAnimation(state)
 						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
+						state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
 						state.m.Unlock()
 
 						break AnimationLoop
@@ -172,7 +173,8 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					state.elapsed += tickDuration
 				case PlayBackwards:
 					if state.elapsed <= 0 {
-						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
+						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, -1)
+						state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, -1)
 						a.stopAnimation(state)
 						state.m.Unlock()
 
@@ -209,16 +211,18 @@ func (a *AnimatorWidget) Build() {
 		s.m.Unlock()
 	}
 
+	s.m.Lock()
+	cf, df := s.currentKeyFrame, s.destinationKeyFrame
+	s.m.Unlock()
+
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		// TODO: implement key frames
-		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, 0, 0, a.Start)
+		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, cf, df, a.Start)
 
 		return
 	}
 
-	// TODO: implement key frames
-	a.a.BuildNormal(0, a.Start)
+	a.a.BuildNormal(cf, a.Start)
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()
