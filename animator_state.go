@@ -19,6 +19,9 @@ type animatorState struct {
 
 	triggerStatus bool
 
+	currentKeyFrame,
+	destinationKeyFrame KeyFrame
+
 	reset chan bool
 	m     *sync.Mutex
 }

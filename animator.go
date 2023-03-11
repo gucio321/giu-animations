@@ -20,11 +20,13 @@ const (
 type AnimatorWidget struct {
 	id string
 
-	duration        time.Duration
-	fps             int
+	duration time.Duration
+	fps      int
+
 	easingAlgorithm EasingAlgorithmType
-	triggerType     TriggerType
-	triggerFunc     TriggerFunc
+
+	triggerType TriggerType
+	triggerFunc TriggerFunc
 
 	a Animation
 }
