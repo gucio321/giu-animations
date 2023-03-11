@@ -145,34 +145,47 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 
 	tickDuration := time.Second / time.Duration(a.fps)
 	for {
-		select {
-		case <-time.Tick(tickDuration):
-			giu.Update()
-			state.m.Lock()
-			switch playMode {
-			case PlayForward:
-				if state.elapsed >= state.duration {
-					a.stopAnimation(state)
-					state.m.Unlock()
-
-					break
-				}
-
-				state.elapsed += tickDuration
-			case PlayBackwards:
-				if state.elapsed <= 0 {
-					a.stopAnimation(state)
-					state.m.Unlock()
-
-					break
-				}
-
-				state.elapsed -= tickDuration
-			}
-
+		state.m.Lock()
+		if state.currentKeyFrame == state.destinationKeyFrame {
 			state.m.Unlock()
-		case <-resetChan:
-			return
+			break
+		}
+
+		state.m.Unlock()
+
+	AnimationLoop:
+		for {
+			select {
+			case <-time.Tick(tickDuration):
+				giu.Update()
+				state.m.Lock()
+				switch playMode {
+				case PlayForward:
+					if state.elapsed >= state.duration {
+						a.stopAnimation(state)
+						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
+						state.m.Unlock()
+
+						break AnimationLoop
+					}
+
+					state.elapsed += tickDuration
+				case PlayBackwards:
+					if state.elapsed <= 0 {
+						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
+						a.stopAnimation(state)
+						state.m.Unlock()
+
+						break AnimationLoop
+					}
+
+					state.elapsed -= tickDuration
+				}
+
+				state.m.Unlock()
+			case <-resetChan:
+				return
+			}
 		}
 	}
 }
