@@ -66,7 +66,7 @@ func loop() {
 						},
 							animations.Step(20, 100).
 								Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
-						),
+						).DefaultStartPos(),
 					).Duration(time.Second*3).
 						FPS(120).
 						EasingAlgorithm(easingAlg).

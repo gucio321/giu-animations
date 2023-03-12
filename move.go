@@ -107,7 +107,9 @@ func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame,
 	destPos := m.getPosition(destFrame)
 	var pos imgui.Vec2
 
-	srcStep := m.steps[srcFrame]
+	steps := m.getSteps()
+
+	srcStep := steps[srcFrame]
 	if srcStep.useBezier {
 		pts := []imgui.Vec2{srcPos}
 		for _, b := range srcStep.bezier {
@@ -184,7 +186,7 @@ func vecMul(vec1 imgui.Vec2, multiplier float32) imgui.Vec2 {
 func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	state := m.getState()
 
-	steps := m.steps
+	steps := m.getSteps()
 	if m.startStep != nil {
 		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
 	}
@@ -201,4 +203,14 @@ func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	}
 
 	return pos
+}
+
+func (m *MoveAnimation) getSteps() []*MoveStep {
+	state := m.getState()
+	steps := m.steps
+	if m.startStep != nil {
+		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
+	}
+
+	return steps
 }
