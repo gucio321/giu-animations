@@ -123,6 +123,15 @@ const (
 
 for further reference, see https://easings.net
 
+### Note about StarterFunc
+
+This interface holds a reference to the part of `AnimatorWidget` responsible
+for starting animations. At the moment, there are three functions
+
+- Start(PlayMode) go to the next KeyFrame (forwards or backwards)
+- StartKF(base, destiny KeyFrame, mode PlayMode) go from `base` to `destiny` in `mode` direction (frame by frame)
+- StartWhole(mode) - play from 0 to last Key Frame
+
 ### Using animator
 
 After constructing an animation, you need to create a special type of giu widget
