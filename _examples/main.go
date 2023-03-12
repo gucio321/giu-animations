@@ -50,6 +50,9 @@ func loop() {
 						Duration(time.Second).
 						FPS(60).
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, imgui.IsItemHovered),
+					giu.Button("Play whole transition!").OnClick(func() {
+						starterFunc.StartWhole(animations.PlayForward)
+					}),
 					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {

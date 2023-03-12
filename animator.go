@@ -155,14 +155,12 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
 
-	state.elapsed = 0
-
 	resetChan := state.reset
 	state.m.Unlock()
 
-	tickDuration := time.Second / time.Duration(a.fps)
 	for {
 		state.m.Lock()
+		state.elapsed = 0
 		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
 			state.m.Unlock()
 			break
@@ -170,6 +168,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 
 		state.m.Unlock()
 
+		tickDuration := time.Second / time.Duration(a.fps)
 	AnimationLoop:
 		for {
 			select {
@@ -177,7 +176,12 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 				giu.Update()
 				state.m.Lock()
 				if state.elapsed >= state.duration {
-					a.stopAnimation(state)
+					state.elapsed = 0
+
+					// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)
+					// This is important mainly because of triggers that might have to be run.
+					giu.Update()
+
 					delta := 1
 					if playMode == PlayBackwards {
 						delta = -1
@@ -199,15 +203,8 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 			}
 		}
 	}
-}
 
-func (a *AnimatorWidget) stopAnimation(state *animatorState) {
 	state.isRunning = false
-	state.elapsed = 0
-
-	// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)
-	// This is important mainly because of triggers that might have to be run.
-	giu.Update()
 }
 
 // Build implements giu.Widget.
