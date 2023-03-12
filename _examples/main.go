@@ -1,9 +1,10 @@
 package main
 
 import (
-	"golang.org/x/image/colornames"
 	"image/color"
 	"time"
+
+	"golang.org/x/image/colornames"
 
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
