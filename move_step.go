@@ -12,7 +12,7 @@ type MoveStep struct {
 	bezier    []imgui.Vec2
 }
 
-// Step creates a new instance of MoveStep
+// Step creates a new instance of MoveStep.
 func Step(x, y float32) *MoveStep {
 	return &MoveStep{
 		positionDelta: imgui.Vec2{X: x, Y: y},

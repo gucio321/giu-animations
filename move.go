@@ -13,7 +13,7 @@ type moveAnimationState struct {
 	startPos imgui.Vec2
 }
 
-// Dispose implements giu.Disposable
+// Dispose implements giu.Disposable.
 func (m *moveAnimationState) Dispose() {
 	// noop
 }
@@ -69,24 +69,24 @@ func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveSte
 }
 
 // DefaultStartPos will set a default value of MoveStep as a starting step.
-// NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points)
+// NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points).
 func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
 	return m.StartPos(func(p imgui.Vec2) *MoveStep {
 		return StepVec(p)
 	})
 }
 
-// Init implements Animation
+// Init implements Animation.
 func (m *MoveAnimation) Init() {
 	m.getState().startPos = imgui.CursorPos()
 }
 
-// Reset implements Animation
+// Reset implements Animation.
 func (m *MoveAnimation) Reset() {
 	// noop
 }
 
-// KeyFrames implements Animation interface
+// KeyFrames implements Animation interface.
 func (m *MoveAnimation) KeyFramesCount() int {
 	l := len(m.steps)
 	if m.startStep != nil {
@@ -96,14 +96,14 @@ func (m *MoveAnimation) KeyFramesCount() int {
 	return l
 }
 
-// BuildNormal implements Animation
+// BuildNormal implements Animation.
 func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc) {
 	imgui.SetCursorPos(m.getPosition(currentKF))
 
 	m.widget(starter).Build()
 }
 
-// BuildAnimation implements Animation
+// BuildAnimation implements Animation.
 func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame, destFrame KeyFrame, starter StarterFunc) {
 	srcPos := m.getPosition(srcFrame)
 	destPos := m.getPosition(destFrame)
@@ -131,7 +131,7 @@ func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame,
 }
 
 // this will return absolute position.
-// If step specifies a relative position, it will go to the previous step
+// If step specifies a relative position, it will go to the previous step.
 func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	state := m.getState()
 

@@ -30,7 +30,7 @@ const (
 
 // Ease takes EasingAlgorithmType and plain percentage value t and returns eased value.
 // The following condition is expected to be met, however they are not restricted anyhow:
-// 0 <= t <= 1
+// 0 <= t <= 1.
 func Ease(alg EasingAlgorithmType, t float32) float32 {
 	switch alg {
 	case EasingAlgNone:

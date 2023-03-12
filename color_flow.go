@@ -1,9 +1,10 @@
 package animations
 
 import (
+	"image/color"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"image/color"
 )
 
 var _ Animation = &ColorFlowAnimation{}

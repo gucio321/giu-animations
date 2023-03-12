@@ -1,8 +1,9 @@
 package animations
 
 import (
-	"github.com/AllenDang/imgui-go"
 	"math"
+
+	"github.com/AllenDang/imgui-go"
 )
 
 func factorial(n int) int {

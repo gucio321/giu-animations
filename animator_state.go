@@ -27,7 +27,7 @@ type animatorState struct {
 	m     *sync.Mutex
 }
 
-// Dispose implements giu.Disposable
+// Dispose implements giu.Disposable.
 func (s *animatorState) Dispose() {
 	// noop
 }

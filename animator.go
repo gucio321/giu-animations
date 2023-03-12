@@ -9,10 +9,10 @@ import (
 
 const (
 	// DefaultFPS is FPS value that should suit most use-cases.
-	// Animator takes this value by default and it could be changed by (*Animator).FPS()
+	// Animator takes this value by default and it could be changed by (*Animator).FPS().
 	DefaultFPS = 60
 	// DefaultDuration is animation's duration set by default.
-	// You can change this by (*Animator).Durations()
+	// You can change this by (*Animator).Durations().
 	DefaultDuration = time.Second / 4
 )
 
@@ -64,7 +64,7 @@ func (a *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
 	return a
 }
 
-// EasingAlgorithm allows to specify easing algorithm
+// EasingAlgorithm allows to specify easing algorithm.
 func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidget {
 	a.easingAlgorithm = alg
 
@@ -111,7 +111,7 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 
 func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 	// TODO: set state here
-	var begin, end = 0, a.numKeyFrames - 1
+	begin, end := 0, a.numKeyFrames-1
 	if playMode == PlayBackwards {
 		begin, end = end, begin
 	}
@@ -196,7 +196,7 @@ func (a *AnimatorWidget) stopAnimation(state *animatorState) {
 	giu.Update()
 }
 
-// Build implements giu.Widget
+// Build implements giu.Widget.
 func (a *AnimatorWidget) Build() {
 	s := a.getState()
 	if a.shouldInit() {
