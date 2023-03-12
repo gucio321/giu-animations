@@ -14,7 +14,7 @@ For complete code, please check out [examples](./_examples)
 
 ### important note
 
-Please make shure that you're using the same version of giu
+Please make sure that you're using the same version of giu
 as this project (technically, you need to use giu version
 that uses the same imgui-go version as yours)
 
@@ -83,11 +83,11 @@ Lets take a closer look on steps now:
     take position and add it to the position of the previous step
     (and do it until it reaches first step or any step with absolute position)
   - After calling `Absolute()` method of the MoveStep, its position becomes
-    absolut so that it does not relay on any previous step.
+    absolute so that it does not rely on any previous step.
 - An additional feature of Steps is a Bezier Curve implementation.
   In order to enable it, simply call `Bezier` method and specify as meny points as you wish.
 
-One more important thing to mention about is the first step.
+One more important thing to mention is the first step.
 By default, position of the first step you specify **will be treated
 absolute, even thouth it wasn't set to be.** To change this
 there are two additional methods of `MoveAnimation`.
@@ -145,7 +145,7 @@ Animator has some useful methods:
 ### Key Frame
 
 Key frames are states of animation with a specified animation states.
-All other states between them are calculated on-go.
+All other states between them are calculated on the go.
 Key frames system in this module is not much experienced, but it should
 suit needs of most users. For more information about implementation
 of this system in particular animation types, see above.
@@ -198,7 +198,7 @@ You can do some calculations there.
 # Contribution
 
 If you implement something interessting, find any bugs, or
-improvements and would be so kind to open a PR,
+improvements and if you would be so kind to open a PR,
 your contribution is welcome!
 
 # Motivation
