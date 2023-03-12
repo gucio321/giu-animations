@@ -6,13 +6,11 @@
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
 animation system.
 
-![giu-animations demo](./docs/demo.gif)
-
 # Documentation
 
 ## How to use?
 
-For complete code, please check out [`_examples`](./_examples)
+For complete code, please check out [examples](./_examples)
 
 ### important note
 
@@ -22,48 +20,44 @@ that uses the same imgui-go version as yours)
 
 ### Defining an animation
 
-At the moment, there are two implementations of animations:
+At the moment, there are three implementations of animations:
 - [Transition](#transition) - a smooth transition between two windows/sets of windows e.t.c.
   **NOTE** applying this animation to single widgets is not implemented yet and may
   not work as expected.
-- [on-hover color change](#hover-color) - you can apply this animation to any **single widget**
-  that `imgui.IsItemHovered` applies for.
-  You can specify any style color you want.
-- [Movement](#move) - moves DrawCursor emulating moving an object (`giu.Widget`).
+- [Color Flow](#color-flow) - you can apply this animation to any widget
+  You can configure this animation to make your button hover smoother or change it into a rainbow!
+- [Movement](#move) - moves DrawCursor emulating moving an object (aka `giu.Widget`).
 
 Lets shortly discuss particular types of animations:
 
-#### transition
+#### Transition
 
 Lets look at the API:
 ```go
-func Transition(renderer1, renderer2 func(starter func()) *TransitionAnimation {...}
+func Transition(renderers ...func(starter func())) *TransitionAnimation {...}
 ```
 
-`renderer1` and `renderer2` are just two stages of trasition.
-In stage 1, `renderer1` is called, and in stage 2 - `renderer2`.
-When animation is being plaid, both renderers are called and suitable
-alpha value is pushed to imgui style for both of them.
-
-The argument to the poth renderers is a pointer to Animator.Start (see later)
+`renderers` are just [key frames](key-frame) of trasition.
+In each stage appropiate renderer is called.
+The argument to the renderers is a pointer to Animator.Start (see later)
 so that you can call it to play the animation.
 
-#### Hover color
+#### Color flow
 
 ```go
-func HoverColor(
+func ColorFlow(
         widget giu.Widget,
-        hoverColor, normalColor func() color.RGBA,
-        hoverID, normalID giu.StyleColorID,
-) *HoverColorAnimation {...}
+        applying []giu.StyleColorID,
+        colors ...func() color.RGBA,
+) *ColorFlowAnimation {...}
 ```
 
-- The first argument is a widget that should apply to
-- hoverColor and normalColor are functions that returns hover and standard (non-hover) colors
-- hoverID, normalID - style IDs that hovering applies to.
+- The first argument is a **function** producing a **widget** that the animation should apply to
+- next is the list of style-color identifiers. Color changes applies to all of them.
+- and the last list of arguments are [key frames](#key-frame) of color flow.
 
-There is also a variant of the above method called `HoverColorStyle`, which does not need
-`hoverColor` and `normalColor` arguments. These colors are obtained
+There is also a variant of the above method called `ColorFlowStyle`, which does not need
+colors list. These colors are obtained
 by function like this:
 ```go
 func() color.RGBA {
@@ -74,17 +68,33 @@ func() color.RGBA {
 #### Move 
 
 ```go
-Move(
-    w giu.Widget,
-    delta imgui.Vec2,
-) *MoveAnimation {...}
+func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {...}
 ```
 
-This will mmove `w` from the position, it was
-at the moment of calling `Move(...)` (called `start`)
-to `start` + `delta`.
+This will move `w` around the steps.
+Lets take a closer look on steps now:
+- You create a step with `Step` or `StepVec` methods.
+- You have two options of specifying position:
+  * you can make it relative to the previous step. This way the system will
+    take position and add it to the position of the previous step
+    (and do it until it reaches first step or any step with absolute position)
+  * After calling `Absolute()` method of the MoveStep, its position becomes
+    absolut so that it does not relay on any previous step.
+- An additional feature of Steps is a Bezier Curve implementation.
+  In order to enable it, simply call `Bezier` method and specify as meny points as you wish.
 
-##### Easing
+One more important thing to mention about is the first step.
+By default, position of the first step you specify **will be treated
+absolute, even thouth it wasn't set to be.** To change this
+there are two additional methods of `MoveAnimation`.
+- the first one is called `StartPos` and takes one argument of the following type:
+  `func(startPos imgui.Vec2) *MoveStep`. It is expected to return non-nil MoveStep.
+  `startPos` argument is the position of drawing cursor at the moment **of first call** of
+  `Animator`.
+- another method is tu simply call `DefaultStartPos` method. It takes no arguments and acts
+  like most users would like to use `StartPos` - it returns `Step(startPos)`.
+
+### Easing
 
 There are some extra ways of playing animation flow:
 
@@ -108,25 +118,6 @@ const (
 
 for further reference, see https://easings.net
 
-##### Bezier curve
-
-Move animation supports [Bezier Curve](https://pomax.github.io/bezierinfo/).
-It meas that move animation could be very smooth if you find it necessary.
-You have two ways to calculate these points:
-- go through [google](https://google.com) and use tone of paper to understand this strange math or
-- just type random values and check what happens :smile:
-
-The api looks as follows:
-
-```go
-func (m *MoveAnimation) Bezier(controlPoints ...imgui.Vec2) *MoveAnimation {...}
-```
-
-you can add as many control points as you which to.
-Each point will make the curve stranger.
-The only thing you need to remember is, that **these points
-are relative to `startPos`**. They will automatically become `startPos` + `controlPoint`.
-
 ### Using animator
 
 After constructing an animation, you need to create a special type of giu widget
@@ -145,6 +136,14 @@ Animator has some useful methods:
 - `Start` - this method you can use to invoke animation play.
 - `IsRunning` returns true, if animation is being plaid right now.
 
+### Key Frame
+
+Key frames are states of animation with a specified animation states.
+All other states between them are calculated on-go.
+Key frames system in this module is not much experienced, but it should
+suit needs of most users. For more information about implementation
+of this system in particular animation types, see above.
+
 ## Creating your own animation
 
 You can use this API to create your own animation.
@@ -153,9 +152,10 @@ To do soo, lets take a look on `Animation` interface.
 type Animation interface {
         Init()
         Reset()
+        KeyFrames() int
 
-        BuildNormal(starter func())
-        BuildAnimation(animationPercentage float32, starter func())
+        BuildNormal(currentKeyFrame KeyFrame, starter func())
+        BuildAnimation(animationPercentage, animationPurePercentage float32, startKeyFrame, destinationKeyFrame KeyFrame, starter func())
 }
 ```
 
@@ -169,6 +169,11 @@ you can put some initialization here.
 ### Reset
 
 Reset is called along with `(*Animator).Start`
+
+### KeyFrames
+
+Returns a number of key frames the animation implements.
+This number determines behaviour of Animator while calling Start*
 
 ### BuildNormal
 
@@ -196,4 +201,4 @@ But (as I'm an author of that system) I've decided to share it for public - feel
 
 # License
 
-This project is shared under (attached) MIT License.
+This project is shared under (attached) [MIT License](LICENSE).
