@@ -21,6 +21,7 @@ that uses the same imgui-go version as yours)
 ### Defining an animation
 
 At the moment, there are three implementations of animations:
+
 - [Transition](#transition) - a smooth transition between two windows/sets of windows e.t.c.
   **NOTE** applying this animation to single widgets is not implemented yet and may
   not work as expected.
@@ -33,6 +34,7 @@ Lets shortly discuss particular types of animations:
 #### Transition
 
 Lets look at the API:
+
 ```go
 func Transition(renderers ...func(starter func())) *TransitionAnimation {...}
 ```
@@ -59,13 +61,14 @@ func ColorFlow(
 There is also a variant of the above method called `ColorFlowStyle`, which does not need
 colors list. These colors are obtained
 by function like this:
+
 ```go
 func() color.RGBA {
     return imgui.CurrentStyle().GetStyleColor(styleID)
 }
 ```
 
-#### Move 
+#### Move
 
 ```go
 func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {...}
@@ -73,12 +76,13 @@ func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnima
 
 This will move `w` around the steps.
 Lets take a closer look on steps now:
+
 - You create a step with `Step` or `StepVec` methods.
 - You have two options of specifying position:
-  * you can make it relative to the previous step. This way the system will
+  - you can make it relative to the previous step. This way the system will
     take position and add it to the position of the previous step
     (and do it until it reaches first step or any step with absolute position)
-  * After calling `Absolute()` method of the MoveStep, its position becomes
+  - After calling `Absolute()` method of the MoveStep, its position becomes
     absolut so that it does not relay on any previous step.
 - An additional feature of Steps is a Bezier Curve implementation.
   In order to enable it, simply call `Bezier` method and specify as meny points as you wish.
@@ -87,6 +91,7 @@ One more important thing to mention about is the first step.
 By default, position of the first step you specify **will be treated
 absolute, even thouth it wasn't set to be.** To change this
 there are two additional methods of `MoveAnimation`.
+
 - the first one is called `StartPos` and takes one argument of the following type:
   `func(startPos imgui.Vec2) *MoveStep`. It is expected to return non-nil MoveStep.
   `startPos` argument is the position of drawing cursor at the moment **of first call** of
@@ -129,10 +134,11 @@ animator's api is designed so that you don't need to do so every time.
 As an argument to `Animator(...)` constuctor, you pass perviously created animation.
 
 Animator has some useful methods:
+
 - `Duration` allows you to specify animation's duration (default is 0.25 s)
 - `FPS` sets Frames per second value for animation playback (default is 60)
-   **NOTE** it is not real application's FPS! It just describes how often
-   animation's status is updated.
+  **NOTE** it is not real application's FPS! It just describes how often
+  animation's status is updated.
 - `Start` - this method you can use to invoke animation play.
 - `IsRunning` returns true, if animation is being plaid right now.
 
@@ -148,6 +154,7 @@ of this system in particular animation types, see above.
 
 You can use this API to create your own animation.
 To do soo, lets take a look on `Animation` interface.
+
 ```go
 type Animation interface {
         Init()
@@ -173,7 +180,7 @@ Reset is called along with `(*Animator).Start`
 ### KeyFrames
 
 Returns a number of key frames the animation implements.
-This number determines behaviour of Animator while calling Start*
+This number determines behaviour of Animator while calling Start\*
 
 ### BuildNormal
 
