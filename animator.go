@@ -51,6 +51,17 @@ func Animator(a Animation) *AnimatorWidget {
 	return result
 }
 
+// ID sets a custom ID to this AnimatorWidget
+// It may be really important when using TransitionAnimation, because
+// sometimes when using sub-animators inside of Transition, it may happen
+// that the second AnimatorWidget will receive the same ID as the previous one.
+// It may cause unexpected behaviours.
+func (a *AnimatorWidget) ID(newID string) *AnimatorWidget {
+	a.id = newID
+
+	return a
+}
+
 // FPS allows to specify FPS value.
 // CAUTION: it will take effect after next call to Start - not applied to currently plaid animation.
 func (a *AnimatorWidget) FPS(fps int) *AnimatorWidget {

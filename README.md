@@ -151,6 +151,17 @@ Animator has some useful methods:
 - `Start` - this method you can use to invoke animation play.
 - `IsRunning` returns true, if animation is being plaid right now.
 
+#### ID
+
+`AnimatorWidget` has a special ID method that allows you to specify
+your own giu-ID. This ID is used to store an internal aniamtor's state
+inside of giu context.
+Using this method is extremely important if you want to avoid confusing panics
+when using TransitionAnimation along with sub-animators inide that animation.
+It may happen, that one animator receives the same ID as the previous one.
+This may lead to unexpected behaviour or even panic! Its good practice to set
+unique ID everywhere!
+
 ### Key Frame
 
 Key frames are states of animation with a specified animation states.
