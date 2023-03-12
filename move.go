@@ -1,15 +1,15 @@
 package animations
 
 import (
+	"log"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"log"
 )
 
 var _ giu.Disposable = &moveAnimationState{}
 
 type moveAnimationState struct {
-	state    bool
 	startPos imgui.Vec2
 }
 
@@ -51,7 +51,8 @@ type MoveAnimation struct {
 }
 
 // Move creates new *MoveAnimations
-// StartPos will be current cursor position
+// NOTE: You may want to take a look on StartPos or DefaultStartPos methods to specify a starting position.
+// otherwise the first step specified will be treated as start position.
 func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {
 	return &MoveAnimation{
 		id:     giu.GenAutoID("MoveAnimation"),
@@ -61,13 +62,14 @@ func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnima
 }
 
 // StartPos allows to specify custom StartPos (item will be moved there immediately).
-// argument function will receive cursor position returned by imgui.GetCursorPos while initializing animation,
-// however the resulting MoveStep does not need to base on it.
+// argument function will receive cursor position returned by imgui.GetCursorPos while initializing animation.
 func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveStep) *MoveAnimation {
 	m.startStep = startPosStep
 	return m
 }
 
+// DefaultStartPos will set a default value of MoveStep as a starting step.
+// NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points)
 func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
 	return m.StartPos(func(p imgui.Vec2) *MoveStep {
 		return StepVec(p)
@@ -81,10 +83,10 @@ func (m *MoveAnimation) Init() {
 
 // Reset implements Animation
 func (m *MoveAnimation) Reset() {
-	state := m.getState()
-	state.state = !state.state
+	// noop
 }
 
+// KeyFrames implements Animation interface
 func (m *MoveAnimation) KeyFrames() int {
 	l := len(m.steps)
 	if m.startStep != nil {
@@ -128,61 +130,8 @@ func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame,
 	m.widget(starter).Build()
 }
 
-type MoveStep struct {
-	positionDelta imgui.Vec2
-	isAbsolute    bool
-
-	useBezier bool
-	bezier    []imgui.Vec2
-}
-
-func Step(x, y float32) *MoveStep {
-	return &MoveStep{
-		positionDelta: imgui.Vec2{X: x, Y: y},
-	}
-}
-
-func StepVec(v imgui.Vec2) *MoveStep {
-	return &MoveStep{
-		positionDelta: v,
-	}
-}
-
-// Bezier allows to specify Bezier Curve points.
-func (m *MoveStep) Bezier(points ...imgui.Vec2) *MoveStep {
-	m.useBezier = true
-	m.bezier = points
-
-	return m
-}
-
-func (m *MoveStep) Absolute() *MoveStep {
-	m.isAbsolute = true
-
-	return m
-}
-
-func vecSum(vec1, vec2 imgui.Vec2) imgui.Vec2 {
-	return imgui.Vec2{
-		X: vec1.X + vec2.X,
-		Y: vec1.Y + vec2.Y,
-	}
-}
-
-func vecDif(vec1, vec2 imgui.Vec2) imgui.Vec2 {
-	return imgui.Vec2{
-		X: vec1.X - vec2.X,
-		Y: vec1.Y - vec2.Y,
-	}
-}
-
-func vecMul(vec1 imgui.Vec2, multiplier float32) imgui.Vec2 {
-	return imgui.Vec2{
-		X: vec1.X * multiplier,
-		Y: vec1.Y * multiplier,
-	}
-}
-
+// this will return absolute position.
+// If step specifies a relative position, it will go to the previous step
 func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	state := m.getState()
 
@@ -205,6 +154,7 @@ func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	return pos
 }
 
+// this will return a list of steps with the first step added if necessary.
 func (m *MoveAnimation) getSteps() []*MoveStep {
 	state := m.getState()
 	steps := m.steps
