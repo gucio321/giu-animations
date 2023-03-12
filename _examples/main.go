@@ -28,14 +28,22 @@ func loop() {
 							giu.Button("start transition").OnClick(func() {
 								starter()
 							}),
-							func() color.RGBA {
-								return colornames.Red
+							[]giu.StyleColorID{
+								giu.StyleColorButtonHovered,
+								giu.StyleColorButton,
 							},
 							func() color.RGBA {
 								return colornames.Blue
 							},
-							giu.StyleColorButtonHovered,
-							giu.StyleColorButton,
+							func() color.RGBA {
+								return colornames.Red
+							},
+							func() color.RGBA {
+								return colornames.Green
+							},
+							func() color.RGBA {
+								return colornames.Yellow
+							},
 						),
 					).
 						Duration(time.Second).
@@ -68,9 +76,14 @@ func loop() {
 			func(starter func()) {
 				giu.Window("window2").Layout(
 					giu.Label("I'm a window 2"),
-					giu.Button("start transition").OnClick(func() {
-						starter()
-					}),
+					animations.Animator(
+						animations.ColorFlowStyle(
+							giu.Button("start transition").OnClick(func() {
+								starter()
+							}),
+							giu.StyleColorButton, giu.StyleColorButtonHovered,
+						),
+					).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
 				)
 			},
 			func(starter func()) {
