@@ -5,6 +5,11 @@ import "log"
 type KeyFrame byte
 
 func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
+	// special case
+	if count == 1 && (delta == 1 || delta == -1) {
+		return 0
+	}
+
 	if delta >= count {
 		log.Panicf("multiple-cycles not supported yet (delta=%v >= max=%v)", delta, count)
 	}
