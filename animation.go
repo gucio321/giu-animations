@@ -9,9 +9,9 @@ type Animation interface {
 	// Reset is called whenever needs to restart animation.
 	Reset()
 
-	// KeyFrames is used mainly by the AnimatorWidget.
+	// KeyFramesCount is used mainly by the AnimatorWidget.
 	// It returns a number of key frames.
-	KeyFrames() int
+	KeyFramesCount() int
 
 	// BuildNormal is called every frame when animation is not running
 	// starter is a link to Animator.Start

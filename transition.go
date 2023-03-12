@@ -16,7 +16,7 @@ func Transition(renderers ...func(starter func())) *TransitionAnimation {
 	}
 }
 
-func (t *TransitionAnimation) KeyFrames() int {
+func (t *TransitionAnimation) KeyFramesCount() int {
 	return len(t.renderers)
 }
 

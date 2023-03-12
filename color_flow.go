@@ -55,7 +55,7 @@ func (h *ColorFlowAnimation) Init() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) KeyFrames() int {
+func (h *ColorFlowAnimation) KeyFramesCount() int {
 	return len(h.color)
 }
 

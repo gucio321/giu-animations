@@ -87,7 +87,7 @@ func (m *MoveAnimation) Reset() {
 }
 
 // KeyFrames implements Animation interface
-func (m *MoveAnimation) KeyFrames() int {
+func (m *MoveAnimation) KeyFramesCount() int {
 	l := len(m.steps)
 	if m.startStep != nil {
 		l++

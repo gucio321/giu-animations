@@ -159,7 +159,7 @@ To do soo, lets take a look on `Animation` interface.
 type Animation interface {
         Init()
         Reset()
-        KeyFrames() int
+        KeyFramesCount() int
 
         BuildNormal(currentKeyFrame KeyFrame, starter func())
         BuildAnimation(animationPercentage, animationPurePercentage float32, startKeyFrame, destinationKeyFrame KeyFrame, starter func())
@@ -177,7 +177,7 @@ you can put some initialization here.
 
 Reset is called along with `(*Animator).Start`
 
-### KeyFrames
+### KeyFramesCount
 
 Returns a number of key frames the animation implements.
 This number determines behaviour of Animator while calling Start\*

@@ -42,7 +42,7 @@ func Animator(a Animation) *AnimatorWidget {
 		duration:        DefaultDuration,
 		fps:             DefaultFPS,
 		easingAlgorithm: EasingAlgNone,
-		numKeyFrames:    a.KeyFrames(),
+		numKeyFrames:    a.KeyFramesCount(),
 	}
 
 	return result
