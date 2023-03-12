@@ -141,12 +141,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
 
-	switch playMode {
-	case PlayForward:
-		state.elapsed = 0
-	case PlayBackwards:
-		state.elapsed = state.duration
-	}
+	state.elapsed = 0
 
 	resetChan := state.reset
 	state.m.Unlock()
@@ -167,30 +162,22 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 			case <-time.Tick(tickDuration):
 				giu.Update()
 				state.m.Lock()
-				switch playMode {
-				case PlayForward:
-					if state.elapsed >= state.duration {
-						a.stopAnimation(state)
-						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
-						state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, 1)
-						state.m.Unlock()
-
-						break AnimationLoop
+				if state.elapsed >= state.duration {
+					a.stopAnimation(state)
+					delta := 1
+					if playMode == PlayBackwards {
+						delta = -1
 					}
 
-					state.elapsed += tickDuration
-				case PlayBackwards:
-					if state.elapsed <= 0 {
-						state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, -1)
-						state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, -1)
-						a.stopAnimation(state)
-						state.m.Unlock()
+					state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, delta)
+					state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, delta)
 
-						break AnimationLoop
-					}
+					state.m.Unlock()
 
-					state.elapsed -= tickDuration
+					break AnimationLoop
 				}
+
+				state.elapsed += tickDuration
 
 				state.m.Unlock()
 			case <-resetChan:
