@@ -16,6 +16,9 @@ const (
 	DefaultDuration = time.Second / 4
 )
 
+var _ giu.Widget = &AnimatorWidget{}
+var _ StarterFunc = &AnimatorWidget{}
+
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
 	id string
@@ -212,12 +215,12 @@ func (a *AnimatorWidget) Build() {
 
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, cf, df, a.Start)
+		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, cf, df, a)
 
 		return
 	}
 
-	a.a.BuildNormal(cf, a.Start)
+	a.a.BuildNormal(cf, a)
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()

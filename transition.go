@@ -7,10 +7,10 @@ import (
 var _ Animation = &TransitionAnimation{}
 
 type TransitionAnimation struct {
-	renderers []func(starter func(mode PlayMode))
+	renderers []func(starterFunc StarterFunc)
 }
 
-func Transition(renderers ...func(starter func(mode PlayMode))) *TransitionAnimation {
+func Transition(renderers ...func(starter StarterFunc)) *TransitionAnimation {
 	return &TransitionAnimation{
 		renderers: renderers,
 	}

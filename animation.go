@@ -1,7 +1,5 @@
 package animations
 
-type StarterFunc func(playMode PlayMode)
-
 // Animation is an interface implemented by each animation.
 type Animation interface {
 	// Init is called once, immediately on start.
