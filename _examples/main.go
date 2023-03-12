@@ -48,7 +48,7 @@ func loop() {
 					).
 						Duration(time.Second).
 						FPS(60).
-						Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
+						Trigger(animations.TriggerOnTrue, animations.PlayForward, imgui.IsItemHovered),
 					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
@@ -63,8 +63,10 @@ func loop() {
 									starter(animations.PlayForward)
 								}),
 							).Size(200, 80)
-						}, imgui.Vec2{X: 20, Y: 100}).
-							Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
+						},
+							animations.Step(20, 100).
+								Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
+						),
 					).Duration(time.Second*3).
 						FPS(120).
 						EasingAlgorithm(easingAlg).

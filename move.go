@@ -44,35 +44,34 @@ var _ Animation = &MoveAnimation{}
 type MoveAnimation struct {
 	id string
 
-	widget   func(starter StarterFunc) giu.Widget
-	posDelta imgui.Vec2
+	widget func(starter StarterFunc) giu.Widget
+	steps  []*MoveStep
 
-	useBezier bool
-	bezier    []imgui.Vec2
+	startStep func(startPos imgui.Vec2) *MoveStep
 }
 
 // Move creates new *MoveAnimations
 // StartPos will be current cursor position
-func Move(w func(starter StarterFunc) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
+func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {
 	return &MoveAnimation{
-		id:       giu.GenAutoID("MoveAnimation"),
-		widget:   w,
-		posDelta: posDelta,
+		id:     giu.GenAutoID("MoveAnimation"),
+		steps:  steps,
+		widget: w,
 	}
 }
 
 // StartPos allows to specify custom StartPos (item will be moved there immediately).
-func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
-	m.getState().startPos = startPos
+// argument function will receive cursor position returned by imgui.GetCursorPos while initializing animation,
+// however the resulting MoveStep does not need to base on it.
+func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveStep) *MoveAnimation {
+	m.startStep = startPosStep
 	return m
 }
 
-// Bezier allows to specify Bezier Curve points.
-func (m *MoveAnimation) Bezier(points ...imgui.Vec2) *MoveAnimation {
-	m.useBezier = true
-	m.bezier = points
-
-	return m
+func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
+	return m.StartPos(func(p imgui.Vec2) *MoveStep {
+		return StepVec(p)
+	})
 }
 
 // Init implements Animation
@@ -87,55 +86,119 @@ func (m *MoveAnimation) Reset() {
 }
 
 func (m *MoveAnimation) KeyFrames() int {
-	// TODO: implement key frames mechanism here
-	return 2
+	l := len(m.steps)
+	if m.startStep != nil {
+		l++
+	}
+
+	return l
 }
 
 // BuildNormal implements Animation
-func (m *MoveAnimation) BuildNormal(_ KeyFrame, starter StarterFunc) {
-	state := m.getState()
-	if state.state {
-		p := imgui.Vec2{
-			X: m.posDelta.X + state.startPos.X,
-			Y: m.posDelta.Y + state.startPos.Y,
-		}
-		imgui.SetCursorPos(p)
-	} else {
-		imgui.SetCursorPos(state.startPos)
-	}
+func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc) {
+	imgui.SetCursorPos(m.getPosition(currentKF))
 
 	m.widget(starter).Build()
 }
 
 // BuildAnimation implements Animation
-func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, _, _ KeyFrame, starter StarterFunc) {
-	state := m.getState()
-
-	if !state.state {
-		animationPercentage = 1 - animationPercentage
-	}
-
+func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame, destFrame KeyFrame, starter StarterFunc) {
+	srcPos := m.getPosition(srcFrame)
+	destPos := m.getPosition(destFrame)
 	var pos imgui.Vec2
-	if m.useBezier {
-		pts := []imgui.Vec2{state.startPos}
-		for _, b := range m.bezier {
+
+	srcStep := m.steps[srcFrame]
+	if srcStep.useBezier {
+		pts := []imgui.Vec2{srcPos}
+		for _, b := range srcStep.bezier {
 			pts = append(pts, imgui.Vec2{
-				X: b.X + state.startPos.X,
-				Y: b.Y + state.startPos.Y,
+				X: b.X + srcPos.X,
+				Y: b.Y + srcPos.Y,
 			})
 		}
-		pts = append(pts, imgui.Vec2{
-			X: state.startPos.X + m.posDelta.X,
-			Y: state.startPos.Y + m.posDelta.Y,
-		})
+		pts = append(pts, destPos)
 		pos = bezier(animationPercentage, pts)
 	} else {
-		pos = imgui.Vec2{
-			X: state.startPos.X + m.posDelta.X*animationPercentage,
-			Y: state.startPos.Y + m.posDelta.Y*animationPercentage,
-		}
+		pos = vecSum(srcPos, vecMul(vecDif(destPos, srcPos), animationPercentage))
 	}
 
 	imgui.SetCursorScreenPos(pos)
 	m.widget(starter).Build()
+}
+
+type MoveStep struct {
+	positionDelta imgui.Vec2
+	isAbsolute    bool
+
+	useBezier bool
+	bezier    []imgui.Vec2
+}
+
+func Step(x, y float32) *MoveStep {
+	return &MoveStep{
+		positionDelta: imgui.Vec2{X: x, Y: y},
+	}
+}
+
+func StepVec(v imgui.Vec2) *MoveStep {
+	return &MoveStep{
+		positionDelta: v,
+	}
+}
+
+// Bezier allows to specify Bezier Curve points.
+func (m *MoveStep) Bezier(points ...imgui.Vec2) *MoveStep {
+	m.useBezier = true
+	m.bezier = points
+
+	return m
+}
+
+func (m *MoveStep) Absolute() *MoveStep {
+	m.isAbsolute = true
+
+	return m
+}
+
+func vecSum(vec1, vec2 imgui.Vec2) imgui.Vec2 {
+	return imgui.Vec2{
+		X: vec1.X + vec2.X,
+		Y: vec1.Y + vec2.Y,
+	}
+}
+
+func vecDif(vec1, vec2 imgui.Vec2) imgui.Vec2 {
+	return imgui.Vec2{
+		X: vec1.X - vec2.X,
+		Y: vec1.Y - vec2.Y,
+	}
+}
+
+func vecMul(vec1 imgui.Vec2, multiplier float32) imgui.Vec2 {
+	return imgui.Vec2{
+		X: vec1.X * multiplier,
+		Y: vec1.Y * multiplier,
+	}
+}
+
+func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
+	state := m.getState()
+
+	steps := m.steps
+	if m.startStep != nil {
+		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
+	}
+
+	pos := imgui.Vec2{}
+	for i := int(currentKF); i >= 0; i-- {
+		s := steps[i]
+
+		pos = vecSum(pos, s.positionDelta)
+
+		if s.isAbsolute {
+			return pos
+		}
+	}
+
+	return pos
 }
