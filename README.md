@@ -36,7 +36,7 @@ Lets shortly discuss particular types of animations:
 Lets look at the API:
 
 ```go
-func Transition(renderers ...func(starter func())) *TransitionAnimation {...}
+func Transition(renderers ...func(starter func(mode PlayMode))) *TransitionAnimation {...}
 ```
 
 `renderers` are just [key frames](key-frame) of trasition.

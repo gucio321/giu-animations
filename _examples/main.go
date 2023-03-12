@@ -20,13 +20,13 @@ func loop() {
 	a := int32(easingAlg)
 	animations.Animator(
 		animations.Transition(
-			func(starter func()) {
+			func(starter func(mode animations.PlayMode)) {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
 					animations.Animator(
 						animations.ColorFlow(
 							giu.Button("start transition").OnClick(func() {
-								starter()
+								starter(animations.PlayForward)
 							}),
 							[]giu.StyleColorID{
 								giu.StyleColorButtonHovered,
@@ -75,25 +75,30 @@ func loop() {
 						}),
 				)
 			},
-			func(starter func()) {
+			func(starter func(mode animations.PlayMode)) {
 				giu.Window("window2").Layout(
 					giu.Label("I'm a window 2"),
 					animations.Animator(
 						animations.ColorFlowStyle(
 							giu.Button("start transition").OnClick(func() {
-								starter()
+								starter(animations.PlayForward)
 							}),
 							giu.StyleColorButton, giu.StyleColorButtonHovered,
 						),
 					).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
 				)
 			},
-			func(starter func()) {
+			func(starter func(mode animations.PlayMode)) {
 				giu.Window("window 3").Layout(
 					giu.Label("I'm third window!"),
-					giu.Button("start transition").OnClick(func() {
-						starter()
-					}),
+					giu.Row(
+						giu.Button("<< Previous Window").OnClick(func() {
+							starter(animations.PlayBackwards)
+						}),
+						giu.Button("Next Window >>").OnClick(func() {
+							starter(animations.PlayForward)
+						}),
+					),
 				)
 			},
 		),

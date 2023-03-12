@@ -7,10 +7,10 @@ import (
 var _ Animation = &TransitionAnimation{}
 
 type TransitionAnimation struct {
-	renderers []func(starter func())
+	renderers []func(starter func(mode PlayMode))
 }
 
-func Transition(renderers ...func(starter func())) *TransitionAnimation {
+func Transition(renderers ...func(starter func(mode PlayMode))) *TransitionAnimation {
 	return &TransitionAnimation{
 		renderers: renderers,
 	}
@@ -24,10 +24,10 @@ func (t *TransitionAnimation) BuildAnimation(percentage, _ float32, bf, df KeyFr
 	layout1 := t.renderers[bf]
 	layout2 := t.renderers[df]
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, percentage)
-	layout2(func() { starter(PlayForward) })
+	layout2(starter)
 	imgui.PopStyleVar()
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, 1-percentage)
-	layout1(func() { starter(PlayForward) })
+	layout1(starter)
 	imgui.PopStyleVar()
 }
 
@@ -40,5 +40,5 @@ func (t *TransitionAnimation) Init() {
 }
 
 func (t *TransitionAnimation) BuildNormal(f KeyFrame, starter StarterFunc) {
-	t.renderers[f](func() { starter(PlayAuto) })
+	t.renderers[f](starter)
 }
