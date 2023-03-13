@@ -19,11 +19,16 @@ type animatorState struct {
 
 	triggerStatus bool
 
+	currentKeyFrame,
+	longTimeDestinationKeyFrame,
+	destinationKeyFrame KeyFrame
+	playMode PlayMode
+
 	reset chan bool
 	m     *sync.Mutex
 }
 
-// Dispose implements giu.Disposable
+// Dispose implements giu.Disposable.
 func (s *animatorState) Dispose() {
 	// noop
 }

@@ -9,22 +9,32 @@ import (
 
 const (
 	// DefaultFPS is FPS value that should suit most use-cases.
-	// Animator takes this value by default and it could be changed by (*Animator).FPS()
+	// Animator takes this value by default and it could be changed by (*Animator).FPS().
 	DefaultFPS = 60
 	// DefaultDuration is animation's duration set by default.
-	// You can change this by (*Animator).Durations()
+	// You can change this by (*Animator).Durations().
 	DefaultDuration = time.Second / 4
+)
+
+var (
+	_ giu.Widget  = &AnimatorWidget{}
+	_ StarterFunc = &AnimatorWidget{}
 )
 
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
 	id string
 
-	duration        time.Duration
-	fps             int
+	duration time.Duration
+	fps      int
+
 	easingAlgorithm EasingAlgorithmType
-	triggerType     TriggerType
-	triggerFunc     TriggerFunc
+
+	triggerType    TriggerType
+	triggerPlyMode PlayMode
+	triggerFunc    TriggerFunc
+
+	numKeyFrames int
 
 	a Animation
 }
@@ -37,9 +47,21 @@ func Animator(a Animation) *AnimatorWidget {
 		duration:        DefaultDuration,
 		fps:             DefaultFPS,
 		easingAlgorithm: EasingAlgNone,
+		numKeyFrames:    a.KeyFramesCount(),
 	}
 
 	return result
+}
+
+// ID sets a custom ID to this AnimatorWidget
+// It may be really important when using TransitionAnimation, because
+// sometimes when using sub-animators inside of Transition, it may happen
+// that the second AnimatorWidget will receive the same ID as the previous one.
+// It may cause unexpected behaviours.
+func (a *AnimatorWidget) ID(newID string) *AnimatorWidget {
+	a.id = newID
+
+	return a
 }
 
 // FPS allows to specify FPS value.
@@ -58,15 +80,16 @@ func (a *AnimatorWidget) Duration(duration time.Duration) *AnimatorWidget {
 	return a
 }
 
-// EasingAlgorithm allows to specify easing algorithm
+// EasingAlgorithm allows to specify easing algorithm.
 func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidget {
 	a.easingAlgorithm = alg
 
 	return a
 }
 
-func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *AnimatorWidget {
+func (a *AnimatorWidget) Trigger(triggerType TriggerType, playMode PlayMode, f TriggerFunc) *AnimatorWidget {
 	a.triggerType = triggerType
+	a.triggerPlyMode = playMode
 	a.triggerFunc = f
 
 	return a
@@ -74,6 +97,45 @@ func (a *AnimatorWidget) Trigger(triggerType TriggerType, f TriggerFunc) *Animat
 
 // Start starts the animation.
 func (a *AnimatorWidget) Start(playMode PlayMode) {
+	state := a.getState()
+	state.m.Lock()
+	cf := state.currentKeyFrame
+	state.m.Unlock()
+	delta := 1
+	if playMode == PlayBackwards {
+		delta = -1
+	}
+
+	a.StartKeyFrames(cf, getWithDelta(cf, a.numKeyFrames, delta), playMode)
+}
+
+func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMode PlayMode) {
+	state := a.getState()
+	state.m.Lock()
+	state.currentKeyFrame = beginKF
+	state.longTimeDestinationKeyFrame = destinationKF
+	switch playMode {
+	case PlayForward:
+		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, 1)
+	case PlayBackwards:
+		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, -1)
+	}
+	state.m.Unlock()
+
+	a.start(playMode)
+}
+
+func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
+	// TODO: set state here
+	begin, end := 0, a.numKeyFrames-1
+	if playMode == PlayBackwards {
+		begin, end = end, begin
+	}
+
+	a.StartKeyFrames(KeyFrame(begin), KeyFrame(end), playMode)
+}
+
+func (a *AnimatorWidget) start(playMode PlayMode) {
 	a.a.Reset()
 	state := a.getState()
 
@@ -86,6 +148,8 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	state.isRunning = true
 	state.duration = a.duration
 
+	state.playMode = playMode
+
 	state.m.Unlock()
 
 	go a.playAnimation(playMode)
@@ -95,60 +159,61 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
 
-	switch playMode {
-	case PlayForward:
-		state.elapsed = 0
-	case PlayBackwards:
-		state.elapsed = state.duration
-	}
-
 	resetChan := state.reset
 	state.m.Unlock()
 
-	tickDuration := time.Second / time.Duration(a.fps)
 	for {
-		select {
-		case <-time.Tick(tickDuration):
-			giu.Update()
-			state.m.Lock()
-			switch playMode {
-			case PlayForward:
+		state.m.Lock()
+		state.elapsed = 0
+		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
+			state.m.Unlock()
+			break
+		}
+
+		state.m.Unlock()
+
+		tickDuration := time.Second / time.Duration(a.fps)
+	AnimationLoop:
+		for {
+			select {
+			case <-time.Tick(tickDuration):
+				giu.Update()
+				state.m.Lock()
 				if state.elapsed >= state.duration {
-					a.stopAnimation(state)
+					state.elapsed = 0
+
+					// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)
+					// This is important mainly because of triggers that might have to be run.
+					giu.Update()
+
+					delta := 1
+					if playMode == PlayBackwards {
+						delta = -1
+					}
+
+					state.currentKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, delta)
+					state.destinationKeyFrame = getWithDelta(state.currentKeyFrame, a.numKeyFrames, delta)
+
 					state.m.Unlock()
 
-					return
+					break AnimationLoop
 				}
 
 				state.elapsed += tickDuration
-			case PlayBackwards:
-				if state.elapsed <= 0 {
-					a.stopAnimation(state)
-					state.m.Unlock()
 
-					return
-				}
-
-				state.elapsed -= tickDuration
+				state.m.Unlock()
+			case <-resetChan:
+				return
 			}
-
-			state.m.Unlock()
-		case <-resetChan:
-			return
 		}
 	}
-}
 
-func (a *AnimatorWidget) stopAnimation(state *animatorState) {
+	state.m.Lock()
 	state.isRunning = false
-	state.elapsed = 0
-
-	// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)
-	// This is important mainly because of triggers that might have to be run.
-	giu.Update()
+	state.m.Unlock()
 }
 
-// Build implements giu.Widget
+// Build implements giu.Widget.
 func (a *AnimatorWidget) Build() {
 	s := a.getState()
 	if a.shouldInit() {
@@ -158,14 +223,24 @@ func (a *AnimatorWidget) Build() {
 		s.m.Unlock()
 	}
 
+	s.m.Lock()
+	cf, df := s.currentKeyFrame, s.destinationKeyFrame
+	playMode := s.playMode
+	s.m.Unlock()
+
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, a.Start)
+		a.a.BuildAnimation(
+			Ease(a.easingAlgorithm, p), p,
+			cf, df,
+			playMode,
+			a,
+		)
 
 		return
 	}
 
-	a.a.BuildNormal(a.Start)
+	a.a.BuildNormal(cf, a)
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()
@@ -174,7 +249,7 @@ func (a *AnimatorWidget) Build() {
 			// noop
 		case TriggerOnTrue:
 			if triggerValue {
-				a.Start(PlayForward)
+				a.Start(a.triggerPlyMode)
 			}
 		case TriggerOnChange:
 			s.m.Lock()
@@ -182,11 +257,7 @@ func (a *AnimatorWidget) Build() {
 			s.m.Unlock()
 
 			if triggerStatus != triggerValue {
-				if triggerValue {
-					a.Start(PlayForward)
-				} else {
-					a.Start(PlayBackwards)
-				}
+				a.Start(a.triggerPlyMode)
 			}
 
 			s.m.Lock()

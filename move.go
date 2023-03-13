@@ -1,19 +1,19 @@
 package animations
 
 import (
+	"log"
+
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
-	"log"
 )
 
 var _ giu.Disposable = &moveAnimationState{}
 
 type moveAnimationState struct {
-	state    bool
 	startPos imgui.Vec2
 }
 
-// Dispose implements giu.Disposable
+// Dispose implements giu.Disposable.
 func (m *moveAnimationState) Dispose() {
 	// noop
 }
@@ -44,93 +44,148 @@ var _ Animation = &MoveAnimation{}
 type MoveAnimation struct {
 	id string
 
-	widget   func(starter StarterFunc) giu.Widget
-	posDelta imgui.Vec2
+	widget func(starter StarterFunc) giu.Widget
+	steps  []*MoveStep
 
-	useBezier bool
-	bezier    []imgui.Vec2
+	startStep func(startPos imgui.Vec2) *MoveStep
 }
 
 // Move creates new *MoveAnimations
-// StartPos will be current cursor position
-func Move(w func(starter StarterFunc) giu.Widget, posDelta imgui.Vec2) *MoveAnimation {
+// NOTE: You may want to take a look on StartPos or DefaultStartPos methods to specify a starting position.
+// otherwise the first step specified will be treated as start position.
+func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {
 	return &MoveAnimation{
-		id:       giu.GenAutoID("MoveAnimation"),
-		widget:   w,
-		posDelta: posDelta,
+		id:     giu.GenAutoID("MoveAnimation"),
+		steps:  steps,
+		widget: w,
 	}
 }
 
-// StartPos allows to specify custom StartPos (item will be moved there immediately.
-func (m *MoveAnimation) StartPos(startPos imgui.Vec2) *MoveAnimation {
-	m.getState().startPos = startPos
+// StartPos allows to specify custom StartPos (item will be moved there immediately).
+// argument function will receive cursor position returned by imgui.GetCursorPos while initializing animation.
+func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveStep) *MoveAnimation {
+	m.startStep = startPosStep
 	return m
 }
 
-// Bezier allows to specify Bezier Curve points.
-func (m *MoveAnimation) Bezier(points ...imgui.Vec2) *MoveAnimation {
-	m.useBezier = true
-	m.bezier = points
-
-	return m
+// DefaultStartPos will set a default value of MoveStep as a starting step.
+// NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points).
+func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
+	return m.StartPos(func(p imgui.Vec2) *MoveStep {
+		return StepVec(p)
+	})
 }
 
-// Init implements Animation
+// Init implements Animation.
 func (m *MoveAnimation) Init() {
 	m.getState().startPos = imgui.CursorPos()
 }
 
-// Reset implements Animation
+// Reset implements Animation.
 func (m *MoveAnimation) Reset() {
-	state := m.getState()
-	state.state = !state.state
+	// noop
 }
 
-// BuildNormal implements Animation
-func (m *MoveAnimation) BuildNormal(starter StarterFunc) {
-	state := m.getState()
-	if state.state {
-		p := imgui.Vec2{
-			X: m.posDelta.X + state.startPos.X,
-			Y: m.posDelta.Y + state.startPos.Y,
-		}
-		imgui.SetCursorPos(p)
-	} else {
-		imgui.SetCursorPos(state.startPos)
+// KeyFramesCount implements Animation interface.
+func (m *MoveAnimation) KeyFramesCount() int {
+	l := len(m.steps)
+	if m.startStep != nil {
+		l++
 	}
+
+	return l
+}
+
+// BuildNormal implements Animation.
+func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc) {
+	imgui.SetCursorPos(m.getPosition(currentKF))
 
 	m.widget(starter).Build()
 }
 
-// BuildAnimation implements Animation
-func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, starter StarterFunc) {
-	state := m.getState()
-
-	if !state.state {
-		animationPercentage = 1 - animationPercentage
-	}
-
+// BuildAnimation implements Animation.
+func (m *MoveAnimation) BuildAnimation(
+	animationPercentage, _ float32,
+	srcFrame, destFrame KeyFrame,
+	mode PlayMode,
+	starter StarterFunc,
+) {
+	startPos := m.getPosition(srcFrame)
+	destPos := m.getPosition(destFrame)
 	var pos imgui.Vec2
-	if m.useBezier {
-		pts := []imgui.Vec2{state.startPos}
-		for _, b := range m.bezier {
+
+	steps := m.getSteps()
+
+	// srcStep depends on animations play mode
+	var srcStep *MoveStep
+	var srcPos imgui.Vec2
+	switch mode {
+	case PlayForward:
+		srcStep = steps[srcFrame]
+		srcPos = m.getPosition(srcFrame)
+	case PlayBackwards:
+		srcStep = steps[destFrame]
+		srcPos = m.getPosition(destFrame)
+	}
+	if srcStep.useBezier {
+		pts := []imgui.Vec2{startPos}
+		l := len(srcStep.bezier)
+		for i := 0; i < l; i++ {
+			var b imgui.Vec2
+			switch mode {
+			case PlayForward:
+				b = srcStep.bezier[i]
+			case PlayBackwards:
+				b = srcStep.bezier[l-i-1]
+			}
+
 			pts = append(pts, imgui.Vec2{
-				X: b.X + state.startPos.X,
-				Y: b.Y + state.startPos.Y,
+				X: b.X + srcPos.X,
+				Y: b.Y + srcPos.Y,
 			})
 		}
-		pts = append(pts, imgui.Vec2{
-			X: state.startPos.X + m.posDelta.X,
-			Y: state.startPos.Y + m.posDelta.Y,
-		})
+
+		pts = append(pts, destPos)
 		pos = bezier(animationPercentage, pts)
 	} else {
-		pos = imgui.Vec2{
-			X: state.startPos.X + m.posDelta.X*animationPercentage,
-			Y: state.startPos.Y + m.posDelta.Y*animationPercentage,
-		}
+		pos = vecSum(startPos, vecMul(vecDif(destPos, startPos), animationPercentage))
 	}
 
 	imgui.SetCursorScreenPos(pos)
 	m.widget(starter).Build()
+}
+
+// this will return absolute position.
+// If step specifies a relative position, it will go to the previous step.
+func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
+	state := m.getState()
+
+	steps := m.getSteps()
+	if m.startStep != nil {
+		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
+	}
+
+	pos := imgui.Vec2{}
+	for i := int(currentKF); i >= 0; i-- {
+		s := steps[i]
+
+		pos = vecSum(pos, s.positionDelta)
+
+		if s.isAbsolute {
+			return pos
+		}
+	}
+
+	return pos
+}
+
+// this will return a list of steps with the first step added if necessary.
+func (m *MoveAnimation) getSteps() []*MoveStep {
+	state := m.getState()
+	steps := m.steps
+	if m.startStep != nil {
+		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
+	}
+
+	return steps
 }

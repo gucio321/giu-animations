@@ -2,21 +2,10 @@ package animations
 
 import (
 	"image/color"
-	"log"
-	"sync"
 
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
 )
-
-type colorFlowAnimationState struct {
-	state bool
-	m     *sync.Mutex
-}
-
-func (s *colorFlowAnimationState) Dispose() {
-	// noop
-}
 
 var _ Animation = &ColorFlowAnimation{}
 
@@ -24,71 +13,67 @@ type ColorFlowAnimation struct {
 	id string
 
 	giu.Widget
-	destinationColor,
-	normalColor func() color.RGBA
 	applyingStyles []giu.StyleColorID
+
+	color []func() color.RGBA
 }
 
 // ColorFlowStyle wraps ColorFlow so that it automatically obtains the color for specified style values.
 func ColorFlowStyle(
 	widget giu.Widget,
-	destiny, normal giu.StyleColorID,
+	normal, destiny giu.StyleColorID,
 ) *ColorFlowAnimation {
 	return ColorFlow(
 		widget,
-		func() color.RGBA {
-			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(destiny)))
-		},
+		[]giu.StyleColorID{normal, destiny},
 		func() color.RGBA {
 			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(normal)))
 		},
-		destiny, normal,
+		func() color.RGBA {
+			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(destiny)))
+		},
 	)
 }
 
 func ColorFlow(
 	widget giu.Widget,
-	destinationColor, normalColor func() color.RGBA,
-	applying ...giu.StyleColorID,
+	applying []giu.StyleColorID,
+	colors ...func() color.RGBA,
 ) *ColorFlowAnimation {
 	return &ColorFlowAnimation{
-		id:               giu.GenAutoID("colorFlowAnimation"),
-		Widget:           widget,
-		destinationColor: destinationColor,
-		normalColor:      normalColor,
-		applyingStyles:   applying,
+		id:             giu.GenAutoID("colorFlowAnimation"),
+		Widget:         widget,
+		applyingStyles: applying,
+		color:          colors,
 	}
 }
 
 func (h *ColorFlowAnimation) Reset() {
-	data := h.getState()
-	data.state = !data.state
+	// noop
 }
 
 func (h *ColorFlowAnimation) Init() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) BuildNormal(starter StarterFunc) {
-	data := h.getState()
+func (h *ColorFlowAnimation) KeyFramesCount() int {
+	return len(h.color)
+}
 
-	var normalColor color.Color
-
-	if data.state {
-		normalColor = h.destinationColor()
-	} else {
-		normalColor = h.normalColor()
-	}
+func (h *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
+	normalColor := h.color[currentKeyFrame]()
 
 	h.build(normalColor)
 }
 
-func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, _ StarterFunc) {
-	// need to call this method here to prevent state from being disposed.
-	_ = h.getState()
-
-	normalColor := giu.ToVec4Color(h.normalColor())
-	destinationColor := giu.ToVec4Color(h.destinationColor())
+func (h *ColorFlowAnimation) BuildAnimation(
+	percentage, _ float32,
+	sourceKeyFrame, destinyKeyFrame KeyFrame,
+	_ PlayMode,
+	_ StarterFunc,
+) {
+	normalColor := giu.ToVec4Color(h.color[sourceKeyFrame]())
+	destinationColor := giu.ToVec4Color(h.color[destinyKeyFrame]())
 
 	normalColor.X += (destinationColor.X - normalColor.X) * percentage
 	normalColor.X = clamp01(normalColor.X)
@@ -108,27 +93,6 @@ func (h *ColorFlowAnimation) build(c color.Color) {
 	defer giu.PopStyleColorV(len(h.applyingStyles))
 
 	h.Widget.Build()
-}
-
-func (h *ColorFlowAnimation) getState() *colorFlowAnimationState {
-	if s := giu.Context.GetState(h.id); s != nil {
-		state, ok := s.(*colorFlowAnimationState)
-		if !ok {
-			log.Panicf("expected state type *colorFlowAnimationState, got %T", s)
-		}
-
-		return state
-	}
-
-	giu.Context.SetState(h.id, h.newState())
-
-	return h.getState()
-}
-
-func (h *ColorFlowAnimation) newState() *colorFlowAnimationState {
-	return &colorFlowAnimationState{
-		m: &sync.Mutex{},
-	}
 }
 
 func clamp01(val float32) float32 {
