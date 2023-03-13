@@ -26,8 +26,8 @@ At the moment, there are three implementations of animations:
   **NOTE** applying this animation to single widgets is not implemented yet and may
   not work as expected.
 - [Color Flow](#color-flow) - you can apply this animation to any widget
-  You can configure this animation to make your button hover smoother or change it into a rainbow!
-- [Movement](#move) - moves DrawCursor emulating moving an object (aka `giu.Widget`).
+  You can configure this animation to make your button hover smoothly or change it into a rainbow!
+- [Movement](#move) - moves DrawCursor, emulating moving an object (aka `giu.Widget`).
 
 Lets shortly discuss particular types of animations:
 
@@ -55,7 +55,7 @@ func ColorFlow(
 ```
 
 - The first argument is a **function** producing a **widget** that the animation should apply to
-- next is the list of style-color identifiers. Color changes applies to all of them.
+- next is the list of style-color identifiers. Color changes apply to all of them.
 - and the last list of arguments are [key frames](#key-frame) of color flow.
 
 There is also a variant of the above method called `ColorFlowStyle`, which does not need
@@ -85,11 +85,11 @@ Lets take a closer look on steps now:
   - After calling `Absolute()` method of the MoveStep, its position becomes
     absolute so that it does not rely on any previous step.
 - An additional feature of Steps is a Bezier Curve implementation.
-  In order to enable it, simply call `Bezier` method and specify as meny points as you wish.
+  In order to enable it, simply call `Bezier` method and specify as many points as you wish.
 
 One more important thing to mention is the first step.
 By default, position of the first step you specify **will be treated
-absolute, even thouth it wasn't set to be.** To change this
+absolute, even though it wasn't set to be.** To change this
 there are two additional methods of `MoveAnimation`.
 
 - the first one is called `StartPos` and takes one argument of the following type:
@@ -101,7 +101,7 @@ there are two additional methods of `MoveAnimation`.
 
 ### Easing
 
-There are some extra ways of playing animation flow:
+These are some additional ways of controlling the flow of animation: 
 
 ```go
 const (
@@ -129,7 +129,7 @@ This interface holds a reference to the part of `AnimatorWidget` responsible
 for starting animations. At the moment, there are three functions
 
 - Start(PlayMode) go to the next KeyFrame (forwards or backwards)
-- StartKF(base, destiny KeyFrame, mode PlayMode) go from `base` to `destiny` in `mode` direction (frame by frame)
+- StartKF(base, destination KeyFrame, mode PlayMode) go from `base` to `destination` in `mode` direction (frame by frame)
 - StartWhole(mode) - play from 0 to last Key Frame
 
 ### Using animator
@@ -140,7 +140,7 @@ called `AnimatorWidget`.
 You may want to store it in a temporary variable, but, as you'll see later,
 animator's api is designed so that you don't need to do so every time.
 
-As an argument to `Animator(...)` constuctor, you pass perviously created animation.
+As an argument to `Animator(...)` constuctor, you pass previously created animation.
 
 Animator has some useful methods:
 
@@ -149,22 +149,22 @@ Animator has some useful methods:
   **NOTE** it is not real application's FPS! It just describes how often
   animation's status is updated.
 - `Start` - this method you can use to invoke animation play.
-- `IsRunning` returns true, if animation is being plaid right now.
+- `IsRunning` returns true, if animation is being played right now.
 
 #### ID
 
 `AnimatorWidget` has a special ID method that allows you to specify
-your own giu-ID. This ID is used to store an internal aniamtor's state
+your own giu-ID. This ID is used to store an internal animator's state
 inside of giu context.
 Using this method is extremely important if you want to avoid confusing panics
-when using TransitionAnimation along with sub-animators inide that animation.
+when using TransitionAnimation along with sub-animators inside that animation.
 It may happen, that one animator receives the same ID as the previous one.
 This may lead to unexpected behaviour or even panic! Its good practice to set
 unique ID everywhere!
 
 ### Auto triggering
 
-Animator provides a simple way of automatical animations start.
+Animator provides a simple way of automated starting of animations.
 You can do this by using `Trigger` method. This method takes three arguments:
 
 - `TriggerType` (TriggerNever, TriggerOnChange, TriggerOnTrue) tells Animator when
@@ -174,16 +174,16 @@ You can do this by using `Trigger` method. This method takes three arguments:
 
 ### Key Frame
 
-Key frames are states of animation with a specified animation states.
+Key frames are specific frames of an animation, other frames get interpolated according to them.
 All other states between them are calculated on the go.
-Key frames system in this module is not much experienced, but it should
+Key frames system in this module is not very advanced, but it should
 suit needs of most users. For more information about implementation
 of this system in particular animation types, see above.
 
 ## Creating your own animation
 
 You can use this API to create your own animation.
-To do soo, lets take a look on `Animation` interface.
+To do soo, lets take a look at the `Animation` interface.
 
 ```go
 type Animation interface {
@@ -196,7 +196,7 @@ type Animation interface {
 }
 ```
 
-_This is a copy from animation.go, but I've removed comments for clearity_
+_This is a copy from animation.go, but I've removed comments for clarity_
 
 ### Init
 
@@ -227,7 +227,7 @@ You can do some calculations there.
 
 # Contribution
 
-If you implement something interessting, find any bugs, or
+If you implement something interesting, find any bugs, or
 improvements and if you would be so kind to open a PR,
 your contribution is welcome!
 
