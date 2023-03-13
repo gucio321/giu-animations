@@ -162,6 +162,16 @@ It may happen, that one animator receives the same ID as the previous one.
 This may lead to unexpected behaviour or even panic! Its good practice to set
 unique ID everywhere!
 
+### Auto triggering
+
+Animator provides a simple way of automatical animations start.
+You can do this by using `Trigger` method. This method takes three arguments:
+
+- `TriggerType` (TriggerNever, TriggerOnChange, TriggerOnTrue) tells Animator when
+  to start the animation.
+- play mode - tells how to start it
+- and the last argument is a trigger function `func() bool` (**TIP** you can use any of `imgui` functions like `imgui.IsItemHovered`)
+
 ### Key Frame
 
 Key frames are states of animation with a specified animation states.
