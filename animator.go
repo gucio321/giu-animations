@@ -16,8 +16,10 @@ const (
 	DefaultDuration = time.Second / 4
 )
 
-var _ giu.Widget = &AnimatorWidget{}
-var _ StarterFunc = &AnimatorWidget{}
+var (
+	_ giu.Widget  = &AnimatorWidget{}
+	_ StarterFunc = &AnimatorWidget{}
+)
 
 // AnimatorWidget is a manager for animation.
 type AnimatorWidget struct {
@@ -204,7 +206,9 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 		}
 	}
 
+	state.m.Lock()
 	state.isRunning = false
+	state.m.Unlock()
 }
 
 // Build implements giu.Widget.
