@@ -22,6 +22,7 @@ type animatorState struct {
 	currentKeyFrame,
 	longTimeDestinationKeyFrame,
 	destinationKeyFrame KeyFrame
+	playMode PlayMode
 
 	reset chan bool
 	m     *sync.Mutex

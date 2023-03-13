@@ -63,9 +63,14 @@ func loop() {
 										easingAlg = animations.EasingAlgorithmType(a)
 									}),
 								),
-								giu.Button("move me!").OnClick(func() {
-									starter.Start(animations.PlayForward)
-								}),
+								giu.Row(
+									giu.Button("play backwards").OnClick(func() {
+										starter.Start(animations.PlayBackwards)
+									}),
+									giu.Button("move me!").OnClick(func() {
+										starter.Start(animations.PlayForward)
+									}),
+								),
 							).Size(200, 80)
 						},
 							animations.Step(20, 100).

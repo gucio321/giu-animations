@@ -27,5 +27,10 @@ type Animation interface {
 	//   does not want this. Exceptions, I see for now may be:
 	// 	 - your animation does not accept negative (or larger than 1) progress values
 	// starter is a link to (*Animator).Start() method.
-	BuildAnimation(animationPercentage, arbitraryPercentage float32, baseKeyFrame, destinationKeyFrame KeyFrame, starterFunc StarterFunc)
+	BuildAnimation(
+		animationPercentage, arbitraryPercentage float32,
+		baseKeyFrame, destinationKeyFrame KeyFrame,
+		mode PlayMode,
+		starterFunc StarterFunc,
+	)
 }

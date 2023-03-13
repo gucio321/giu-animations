@@ -86,7 +86,7 @@ func (m *MoveAnimation) Reset() {
 	// noop
 }
 
-// KeyFrames implements Animation interface.
+// KeyFramesCount implements Animation interface.
 func (m *MoveAnimation) KeyFramesCount() int {
 	l := len(m.steps)
 	if m.startStep != nil {
@@ -104,26 +104,51 @@ func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc) {
 }
 
 // BuildAnimation implements Animation.
-func (m *MoveAnimation) BuildAnimation(animationPercentage, _ float32, srcFrame, destFrame KeyFrame, starter StarterFunc) {
-	srcPos := m.getPosition(srcFrame)
+func (m *MoveAnimation) BuildAnimation(
+	animationPercentage, _ float32,
+	srcFrame, destFrame KeyFrame,
+	mode PlayMode,
+	starter StarterFunc,
+) {
+	startPos := m.getPosition(srcFrame)
 	destPos := m.getPosition(destFrame)
 	var pos imgui.Vec2
 
 	steps := m.getSteps()
 
-	srcStep := steps[srcFrame]
+	// srcStep depends on animations play mode
+	var srcStep *MoveStep
+	var srcPos imgui.Vec2
+	switch mode {
+	case PlayForward:
+		srcStep = steps[srcFrame]
+		srcPos = m.getPosition(srcFrame)
+	case PlayBackwards:
+		srcStep = steps[destFrame]
+		srcPos = m.getPosition(destFrame)
+	}
 	if srcStep.useBezier {
-		pts := []imgui.Vec2{srcPos}
-		for _, b := range srcStep.bezier {
+		pts := []imgui.Vec2{startPos}
+		l := len(srcStep.bezier)
+		for i := 0; i < l; i++ {
+			var b imgui.Vec2
+			switch mode {
+			case PlayForward:
+				b = srcStep.bezier[i]
+			case PlayBackwards:
+				b = srcStep.bezier[l-i-1]
+			}
+
 			pts = append(pts, imgui.Vec2{
 				X: b.X + srcPos.X,
 				Y: b.Y + srcPos.Y,
 			})
 		}
+
 		pts = append(pts, destPos)
 		pos = bezier(animationPercentage, pts)
 	} else {
-		pos = vecSum(srcPos, vecMul(vecDif(destPos, srcPos), animationPercentage))
+		pos = vecSum(startPos, vecMul(vecDif(destPos, startPos), animationPercentage))
 	}
 
 	imgui.SetCursorScreenPos(pos)

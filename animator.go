@@ -148,6 +148,8 @@ func (a *AnimatorWidget) start(playMode PlayMode) {
 	state.isRunning = true
 	state.duration = a.duration
 
+	state.playMode = playMode
+
 	state.m.Unlock()
 
 	go a.playAnimation(playMode)
@@ -223,11 +225,17 @@ func (a *AnimatorWidget) Build() {
 
 	s.m.Lock()
 	cf, df := s.currentKeyFrame, s.destinationKeyFrame
+	playMode := s.playMode
 	s.m.Unlock()
 
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		a.a.BuildAnimation(Ease(a.easingAlgorithm, p), p, cf, df, a)
+		a.a.BuildAnimation(
+			Ease(a.easingAlgorithm, p), p,
+			cf, df,
+			playMode,
+			a,
+		)
 
 		return
 	}

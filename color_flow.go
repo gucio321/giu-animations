@@ -66,7 +66,12 @@ func (h *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc
 	h.build(normalColor)
 }
 
-func (h *ColorFlowAnimation) BuildAnimation(percentage, _ float32, sourceKeyFrame, destinyKeyFrame KeyFrame, _ StarterFunc) {
+func (h *ColorFlowAnimation) BuildAnimation(
+	percentage, _ float32,
+	sourceKeyFrame, destinyKeyFrame KeyFrame,
+	_ PlayMode,
+	_ StarterFunc,
+) {
 	normalColor := giu.ToVec4Color(h.color[sourceKeyFrame]())
 	destinationColor := giu.ToVec4Color(h.color[destinyKeyFrame]())
 
