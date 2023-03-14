@@ -39,8 +39,8 @@ func (m *MoveAnimation) newState() *moveAnimationState {
 
 var _ Animation = &MoveAnimation{}
 
-// MoveAnimation moves a widget from start position to destination.
-// You can also specify a Bézier curve's points.
+// MoveAnimation moves animation widget from start position to destination.
+// You can also specify animation Bézier curve's points.
 type MoveAnimation struct {
 	id string
 
@@ -51,7 +51,7 @@ type MoveAnimation struct {
 }
 
 // Move creates new *MoveAnimations
-// NOTE: You may want to take a look on StartPos or DefaultStartPos methods to specify a starting position.
+// NOTE: You may want to take animation look on StartPos or DefaultStartPos methods to specify animation starting position.
 // otherwise the first step specified will be treated as start position.
 func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnimation {
 	return &MoveAnimation{
@@ -68,7 +68,7 @@ func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveSte
 	return m
 }
 
-// DefaultStartPos will set a default value of MoveStep as a starting step.
+// DefaultStartPos will set animation default value of MoveStep as animation starting step.
 // NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points).
 func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
 	return m.StartPos(func(p imgui.Vec2) *MoveStep {
@@ -156,7 +156,7 @@ func (m *MoveAnimation) BuildAnimation(
 }
 
 // this will return absolute position.
-// If step specifies a relative position, it will go to the previous step.
+// If step specifies animation relative position, it will go to the previous step.
 func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	state := m.getState()
 
@@ -179,7 +179,7 @@ func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	return pos
 }
 
-// this will return a list of steps with the first step added if necessary.
+// this will return animation list of steps with the first step added if necessary.
 func (m *MoveAnimation) getSteps() []*MoveStep {
 	state := m.getState()
 	steps := m.steps

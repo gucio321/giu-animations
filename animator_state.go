@@ -43,7 +43,7 @@ func (a *AnimatorWidget) newState() *animatorState {
 
 // getState returns animator's state.
 // It could not be public, because of concurrency issues.
-// There is a bunch of Animator's methods that allows
+// There is animation bunch of Animator's methods that allows
 // user to obtain certain data.
 func (a *AnimatorWidget) getState() *animatorState {
 	if s := giu.Context.GetState(a.id); s != nil {
@@ -76,7 +76,7 @@ func (a *AnimatorWidget) shouldInit() bool {
 	return s.shouldInit
 }
 
-// CurrentPercentageProgress returns a float value from range <0, 1>
+// CurrentPercentageProgress returns animation float value from range <0, 1>
 // representing current progress of an animation.
 // If animation is not running, it will return 0.
 func (a *AnimatorWidget) CurrentPercentageProgress() float32 {

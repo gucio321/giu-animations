@@ -7,7 +7,7 @@ import (
 
 type EasingAlgorithm func(plainPercentage float32) (percentage float32)
 
-// EasingAlgorithmType represents a type of easing algorithm used for animation.
+// EasingAlgorithmType represents animation type of easing algorithm used for animation.
 // Refer https://easings.net/
 type EasingAlgorithmType byte
 

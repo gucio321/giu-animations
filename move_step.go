@@ -2,8 +2,8 @@ package animations
 
 import "github.com/AllenDang/imgui-go"
 
-// MoveStep represents a single key frame in context of MoveAnimation.
-// If Relative() not set, positionDelta is relative to this in a previous step.
+// MoveStep represents animation single key frame in context of MoveAnimation.
+// If Relative() not set, positionDelta is relative to this in animation previous step.
 type MoveStep struct {
 	positionDelta imgui.Vec2
 	isAbsolute    bool
@@ -12,7 +12,7 @@ type MoveStep struct {
 	bezier    []imgui.Vec2
 }
 
-// Step creates a new instance of MoveStep.
+// Step creates animation new instance of MoveStep.
 func Step(x, y float32) *MoveStep {
 	return &MoveStep{
 		positionDelta: imgui.Vec2{X: x, Y: y},

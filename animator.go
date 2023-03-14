@@ -1,4 +1,4 @@
-// Package animations contains my attempt to create a kind of "animations" in imgui.
+// Package animations contains my attempt to create animation kind of "animations" in imgui.
 package animations
 
 import (
@@ -21,7 +21,7 @@ var (
 	_ StarterFunc = &AnimatorWidget{}
 )
 
-// AnimatorWidget is a manager for animation.
+// AnimatorWidget is animation manager for animation.
 type AnimatorWidget struct {
 	id string
 
@@ -36,14 +36,14 @@ type AnimatorWidget struct {
 
 	numKeyFrames int
 
-	a Animation
+	animation Animation
 }
 
-// Animator creates a new AnimatorWidget.
+// Animator creates animation new AnimatorWidget.
 func Animator(a Animation) *AnimatorWidget {
 	result := &AnimatorWidget{
 		id:              giu.GenAutoID("Animation"),
-		a:               a,
+		animation:       a,
 		duration:        DefaultDuration,
 		fps:             DefaultFPS,
 		easingAlgorithm: EasingAlgNone,
@@ -53,7 +53,7 @@ func Animator(a Animation) *AnimatorWidget {
 	return result
 }
 
-// ID sets a custom ID to this AnimatorWidget
+// ID sets animation custom ID to this AnimatorWidget
 // It may be really important when using TransitionAnimation, because
 // sometimes when using sub-animators inside of Transition, it may happen
 // that the second AnimatorWidget will receive the same ID as the previous one.
@@ -126,7 +126,6 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 }
 
 func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
-	// TODO: set state here
 	begin, end := 0, a.numKeyFrames-1
 	if playMode == PlayBackward {
 		begin, end = end, begin
@@ -136,7 +135,7 @@ func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 }
 
 func (a *AnimatorWidget) start(playMode PlayMode) {
-	a.a.Reset()
+	a.animation.Reset()
 	state := a.getState()
 
 	state.m.Lock()
@@ -217,7 +216,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 func (a *AnimatorWidget) Build() {
 	s := a.getState()
 	if a.shouldInit() {
-		a.a.Init()
+		a.animation.Init()
 		s.m.Lock()
 		s.shouldInit = false
 		s.m.Unlock()
@@ -230,7 +229,7 @@ func (a *AnimatorWidget) Build() {
 
 	if a.IsRunning() {
 		p := a.CurrentPercentageProgress()
-		a.a.BuildAnimation(
+		a.animation.BuildAnimation(
 			Ease(a.easingAlgorithm, p), p,
 			cf, df,
 			playMode,
@@ -240,7 +239,7 @@ func (a *AnimatorWidget) Build() {
 		return
 	}
 
-	a.a.BuildNormal(cf, a)
+	a.animation.BuildNormal(cf, a)
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()
