@@ -65,7 +65,7 @@ func loop() {
 								),
 								giu.Row(
 									giu.Button("play backwards").OnClick(func() {
-										starter.Start(animations.PlayBackwards)
+										starter.Start(animations.PlayBackward)
 									}),
 									giu.Button("move me!").OnClick(func() {
 										starter.Start(animations.PlayForward)
@@ -102,7 +102,7 @@ func loop() {
 					giu.Label("I'm third window!"),
 					giu.Row(
 						giu.Button("<< Previous Window").OnClick(func() {
-							starterFunc.Start(animations.PlayBackwards)
+							starterFunc.Start(animations.PlayBackward)
 						}),
 						giu.Button("Next Window >>").OnClick(func() {
 							starterFunc.Start(animations.PlayForward)

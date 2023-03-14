@@ -102,7 +102,7 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	cf := state.currentKeyFrame
 	state.m.Unlock()
 	delta := 1
-	if playMode == PlayBackwards {
+	if playMode == PlayBackward {
 		delta = -1
 	}
 
@@ -117,7 +117,7 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 	switch playMode {
 	case PlayForward:
 		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, 1)
-	case PlayBackwards:
+	case PlayBackward:
 		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, -1)
 	}
 	state.m.Unlock()
@@ -128,7 +128,7 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 	// TODO: set state here
 	begin, end := 0, a.numKeyFrames-1
-	if playMode == PlayBackwards {
+	if playMode == PlayBackward {
 		begin, end = end, begin
 	}
 
@@ -187,7 +187,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					giu.Update()
 
 					delta := 1
-					if playMode == PlayBackwards {
+					if playMode == PlayBackward {
 						delta = -1
 					}
 

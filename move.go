@@ -123,7 +123,7 @@ func (m *MoveAnimation) BuildAnimation(
 	case PlayForward:
 		srcStep = steps[srcFrame]
 		srcPos = m.getPosition(srcFrame)
-	case PlayBackwards:
+	case PlayBackward:
 		srcStep = steps[destFrame]
 		srcPos = m.getPosition(destFrame)
 	}
@@ -135,7 +135,7 @@ func (m *MoveAnimation) BuildAnimation(
 			switch mode {
 			case PlayForward:
 				b = srcStep.bezier[i]
-			case PlayBackwards:
+			case PlayBackward:
 				b = srcStep.bezier[l-i-1]
 			}
 
