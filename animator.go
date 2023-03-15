@@ -21,22 +21,30 @@ var (
 	_ StarterFunc = &AnimatorWidget{}
 )
 
-// AnimatorWidget is animation manager for animation.
+// AnimatorWidget is animation manager for Animation.
+// It is a giu.Widget (so you can use it in any giu.Layout).
+// This type provides a wide API that allows you to manage your animation
+// such as Start* functions or parameters like FPS or Duration.
+// It is actually responsible for advancement of animation.
+// NOTE: This type should be concurrent-safe. If you find any data race
+// please open an issue in source repository.
 type AnimatorWidget struct {
+	// giu ID used for storing internal state
 	id string
 
+	// playback properties
 	duration time.Duration
 	fps      int
 
 	easingAlgorithm EasingAlgorithmType
 
+	// triggers
 	triggerType    TriggerType
 	triggerPlyMode PlayMode
 	triggerFunc    TriggerFunc
 
-	numKeyFrames int
-
-	animation Animation
+	animation    Animation
+	numKeyFrames int // <- Filled in in Animator call. SHOULD NOT CHANGE after it.
 }
 
 // Animator creates animation new AnimatorWidget.
@@ -87,6 +95,9 @@ func (a *AnimatorWidget) EasingAlgorithm(alg EasingAlgorithmType) *AnimatorWidge
 	return a
 }
 
+// Trigger sets automatic triggering of animation.
+//
+//	Example: (*AnimatorWidget).Trigger(TriggerOnChange, imgui.IsItemHovered)
 func (a *AnimatorWidget) Trigger(triggerType TriggerType, playMode PlayMode, f TriggerFunc) *AnimatorWidget {
 	a.triggerType = triggerType
 	a.triggerPlyMode = playMode
@@ -96,6 +107,7 @@ func (a *AnimatorWidget) Trigger(triggerType TriggerType, playMode PlayMode, f T
 }
 
 // Start starts the animation.
+// It plays one single frame forwards/backwards (depending on playMode).
 func (a *AnimatorWidget) Start(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
@@ -109,6 +121,8 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	a.StartKeyFrames(cf, getWithDelta(cf, a.numKeyFrames, delta), playMode)
 }
 
+// StartKeyFrames initializes animation playback from beginKF to destination KF in direction
+// specified by playMode.
 func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
@@ -125,6 +139,7 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 	a.start(playMode)
 }
 
+// StartWhole plays an animation from start to end (optionally from end to start)
 func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 	begin, end := 0, a.numKeyFrames-1
 	if playMode == PlayBackward {
@@ -134,6 +149,8 @@ func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
 	a.StartKeyFrames(KeyFrame(begin), KeyFrame(end), playMode)
 }
 
+// internal start method. Stops animator if running and re-initializes it.
+// It will call playAnimation in a new goroutine.
 func (a *AnimatorWidget) start(playMode PlayMode) {
 	a.animation.Reset()
 	state := a.getState()
@@ -154,6 +171,9 @@ func (a *AnimatorWidget) start(playMode PlayMode) {
 	go a.playAnimation(playMode)
 }
 
+// playAnimation is where the animation is plaid.
+// It runs a for loop through all the frames that it should go.
+// It will exit if any message received on state.reset
 func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
