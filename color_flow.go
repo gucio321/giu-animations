@@ -9,6 +9,8 @@ import (
 
 var _ Animation = &ColorFlowAnimation{}
 
+// ColorFlowAnimation makes a smooth flow from one color to another
+// on all specified StyleColor variables.
 type ColorFlowAnimation struct {
 	id string
 
@@ -35,6 +37,30 @@ func ColorFlowStyle(
 	)
 }
 
+// ColorFlowColors takes a colors list instead of list of functions returning colors.
+func ColorFlowColors(
+	widget giu.Widget,
+	applying []giu.StyleColorID,
+	colors ...color.Color,
+) *ColorFlowAnimation {
+	c := make([]func() color.RGBA, len(colors))
+	for i := range c {
+		i := i
+		c[i] = func() color.RGBA {
+			r, g, b, a := colors[i].RGBA()
+			return color.RGBA{
+				R: byte(r),
+				G: byte(g),
+				B: byte(b),
+				A: byte(a),
+			}
+		}
+	}
+
+	return ColorFlow(widget, applying, c...)
+}
+
+// ColorFlow creates a new ColorFlowAnimation.
 func ColorFlow(
 	widget giu.Widget,
 	applying []giu.StyleColorID,
@@ -48,32 +74,37 @@ func ColorFlow(
 	}
 }
 
-func (h *ColorFlowAnimation) Reset() {
+// Reset implements Animation.
+func (c *ColorFlowAnimation) Reset() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) Init() {
+// Init implements Animation.
+func (c *ColorFlowAnimation) Init() {
 	// noop
 }
 
-func (h *ColorFlowAnimation) KeyFramesCount() int {
-	return len(h.color)
+// KeyFramesCount implements Animation.
+func (c *ColorFlowAnimation) KeyFramesCount() int {
+	return len(c.color)
 }
 
-func (h *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
-	normalColor := h.color[currentKeyFrame]()
+// BuildNormal builds animation in normal, not-triggered state.
+func (c *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
+	normalColor := c.color[currentKeyFrame]()
 
-	h.build(normalColor)
+	c.build(normalColor)
 }
 
-func (h *ColorFlowAnimation) BuildAnimation(
+// BuildAnimation implements Animation.
+func (c *ColorFlowAnimation) BuildAnimation(
 	percentage, _ float32,
 	sourceKeyFrame, destinyKeyFrame KeyFrame,
 	_ PlayMode,
 	_ StarterFunc,
 ) {
-	normalColor := giu.ToVec4Color(h.color[sourceKeyFrame]())
-	destinationColor := giu.ToVec4Color(h.color[destinyKeyFrame]())
+	normalColor := giu.ToVec4Color(c.color[sourceKeyFrame]())
+	destinationColor := giu.ToVec4Color(c.color[destinyKeyFrame]())
 
 	normalColor.X += (destinationColor.X - normalColor.X) * percentage
 	normalColor.X = clamp01(normalColor.X)
@@ -82,17 +113,17 @@ func (h *ColorFlowAnimation) BuildAnimation(
 	normalColor.Z += (destinationColor.Z - normalColor.Z) * percentage
 	normalColor.Z = clamp01(normalColor.Z)
 
-	h.build(giu.Vec4ToRGBA(normalColor))
+	c.build(giu.Vec4ToRGBA(normalColor))
 }
 
-func (h *ColorFlowAnimation) build(c color.Color) {
-	for _, s := range h.applyingStyles {
-		giu.PushStyleColor(s, c)
+func (c *ColorFlowAnimation) build(col color.Color) {
+	for _, s := range c.applyingStyles {
+		giu.PushStyleColor(s, col)
 	}
 
-	defer giu.PopStyleColorV(len(h.applyingStyles))
+	defer giu.PopStyleColorV(len(c.applyingStyles))
 
-	h.Widget.Build()
+	c.Widget.Build()
 }
 
 func clamp01(val float32) float32 {
