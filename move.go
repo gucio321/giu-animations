@@ -151,7 +151,7 @@ func (m *MoveAnimation) BuildAnimation(
 		pos = vecSum(startPos, vecMul(vecDif(destPos, startPos), animationPercentage))
 	}
 
-	imgui.SetCursorScreenPos(pos)
+	imgui.SetCursorPos(pos)
 	m.widget(starter).Build()
 }
 
