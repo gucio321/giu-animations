@@ -2,7 +2,6 @@
 package animations
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/AllenDang/giu"
@@ -187,7 +186,6 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 
 	for {
 		state.m.Lock()
-		fmt.Println(state.numberOfCycles)
 		state.elapsed = 0
 		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
 			if state.numberOfCycles == 0 {
