@@ -8,6 +8,15 @@
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
 animation system.
 
+# Contributors
+
+<table>
+<tr>
+  <td align="center"><a href="https://github.com/sponsors/gucio321"><img src="https://avatars.githubusercontent.com/u/73652197?v=4" width="100px;" alt=""/><br /><sub><b>@gucio321</b><br>Head Developer</sub></a></td>
+  <td align="center"><a href="https://instagram.com/sirthunderek5"><img src="https://avatars.githubusercontent.com/u/95303766?v=4" width="100px;" alt=""/><br /><sub><b>@sirthunderek</b><br>Logo design</sub></a></td>
+</tr>
+</table>
+
 # Documentation
 
 ## How to use?
