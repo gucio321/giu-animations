@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"time"
 
 	"golang.org/x/image/colornames"
@@ -25,7 +24,7 @@ func loop() {
 				giu.Window("window1").Layout(
 					giu.Label("I'm a window 1"),
 					animations.Animator(
-						animations.ColorFlow(
+						animations.ColorFlowColors(
 							giu.Button("start transition").OnClick(func() {
 								starterFunc.Start(animations.PlayForward)
 							}),
@@ -33,20 +32,13 @@ func loop() {
 								giu.StyleColorButtonHovered,
 								giu.StyleColorButton,
 							},
-							func() color.RGBA {
-								return colornames.Blue
-							},
-							func() color.RGBA {
-								return colornames.Red
-							},
-							func() color.RGBA {
-								return colornames.Green
-							},
-							func() color.RGBA {
-								return colornames.Yellow
-							},
+							colornames.Blue,
+							colornames.Red,
+							colornames.Green,
+							colornames.Yellow,
 						),
 					).
+						ID("colorful-button").
 						Duration(time.Second).
 						FPS(60).
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, imgui.IsItemHovered),
@@ -94,7 +86,9 @@ func loop() {
 							}),
 							giu.StyleColorButton, giu.StyleColorButtonHovered,
 						),
-					).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
+					).
+						ID("button-with-animated-default-color").
+						Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
