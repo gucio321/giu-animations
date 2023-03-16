@@ -19,6 +19,7 @@ type animatorState struct {
 
 	triggerStatus bool
 
+	numberOfCycles int
 	currentKeyFrame,
 	longTimeDestinationKeyFrame,
 	destinationKeyFrame KeyFrame

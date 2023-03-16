@@ -8,6 +8,7 @@ import "log"
 type KeyFrame byte
 
 // getWithDelta returns clamp(0, count-1, current + delta)
+// it can return a numbers of cycles to be performed
 // TODO(gucio321): I believe it could be done simpler.
 func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
 	// special case
@@ -16,12 +17,12 @@ func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
 	}
 
 	if delta >= count {
-		log.Panicf("multiple-cycles not supported yet (delta=%v >= max=%v)", delta, count)
+		log.Panicf("Unexpected delta received: %v expected at most %v", delta, count-1)
 	}
 
 	result := int(current) + delta
 	if result < 0 {
-		result = count - result
+		result = count + result
 	}
 
 	if result >= count {

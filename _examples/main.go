@@ -42,9 +42,15 @@ func loop() {
 						Duration(time.Second).
 						FPS(60).
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, imgui.IsItemHovered),
-					giu.Button("Play whole transition!").OnClick(func() {
-						starterFunc.StartWhole(animations.PlayForward)
-					}),
+					giu.Row(
+						giu.Button("<<").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayBackward)
+						}),
+						giu.Label("Play whole transition"),
+						giu.Button(">>").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayForward)
+						}),
+					),
 					giu.Checkbox("Play on hover", &playOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
@@ -89,6 +95,15 @@ func loop() {
 					).
 						ID("button-with-animated-default-color").
 						Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
+					giu.Row(
+						giu.Button("<<").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayBackward)
+						}),
+						giu.Label("Play whole transition"),
+						giu.Button(">>").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayForward)
+						}),
+					),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
@@ -100,6 +115,15 @@ func loop() {
 						}),
 						giu.Button("Next Window >>").OnClick(func() {
 							starterFunc.Start(animations.PlayForward)
+						}),
+					),
+					giu.Row(
+						giu.Button("<<").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayBackward)
+						}),
+						giu.Label("Play whole transition"),
+						giu.Button(">>").OnClick(func() {
+							starterFunc.StartCycle(1, animations.PlayForward)
 						}),
 					),
 				)
