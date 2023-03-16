@@ -22,7 +22,7 @@ func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
 
 	result := int(current) + delta
 	if result < 0 {
-		result = count - result
+		result = count + result
 	}
 
 	if result >= count {
