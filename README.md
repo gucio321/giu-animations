@@ -115,7 +115,7 @@ there are two additional methods of `MoveAnimation`.
 
 ### Easing
 
-These are some additional ways of controlling the flow of animation: 
+These are some additional ways of controlling the flow of animation:
 
 ```go
 const (
@@ -145,7 +145,7 @@ for starting animations. At the moment, there are three functions
 - `Start(PlayMode)` go to the next KeyFrame (forwards or backwards)
 - `StartCycle(numberOfCycles int, mode PlayMode)` - play animation `numberOfCycles` times starting and ending on this frame.
 - `StartKF(base, destination KeyFrame, numberOfCycles int, mode PlayMode)`
-go from `base` to `destination` in `mode` direction (frame by frame) making `numberOfCycles` cycles
+  go from `base` to `destination` in `mode` direction (frame by frame) making `numberOfCycles` cycles
 
 ### Using animator
 
