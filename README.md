@@ -1,7 +1,9 @@
+<link rel="shortcut icon" type="image/png" href="logo.png">
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/gucio321/giu-animations)](https://goreportcard.com/report/github.com/gucio321/giu-animations)
 [![GoDoc](https://pkg.go.dev/badge/github.com/gucio321/giu-animations?utm_source=godoc)](https://pkg.go.dev/mod/github.com/gucio321/giu-animations)
 
-<h1 align="center"">GIU Animations</h1>
+<h1 align="center">GIU Animations</h1>
 <p align="center">
 <img src="./logo.png">
 </p>
