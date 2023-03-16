@@ -2,6 +2,7 @@
 package animations
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/AllenDang/giu"
@@ -118,12 +119,13 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 		delta = -1
 	}
 
-	a.StartKeyFrames(cf, getWithDelta(cf, a.numKeyFrames, delta), playMode)
+	destinationFrame := getWithDelta(cf, a.numKeyFrames, delta)
+	a.StartKeyFrames(cf, destinationFrame, 0, playMode)
 }
 
 // StartKeyFrames initializes animation playback from beginKF to destination KF in direction
 // specified by playMode.
-func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMode PlayMode) {
+func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, cyclesCount int, playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
 	state.currentKeyFrame = beginKF
@@ -134,19 +136,21 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, playMod
 	case PlayBackward:
 		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, -1)
 	}
+
+	state.numberOfCycles = cyclesCount
+
 	state.m.Unlock()
 
 	a.start(playMode)
 }
 
-// StartWhole plays an animation from start to end (optionally from end to start)
-func (a *AnimatorWidget) StartWhole(playMode PlayMode) {
-	begin, end := 0, a.numKeyFrames-1
-	if playMode == PlayBackward {
-		begin, end = end, begin
-	}
-
-	a.StartKeyFrames(KeyFrame(begin), KeyFrame(end), playMode)
+// StartCycle plays an animation from start to end (optionally from end to start)
+func (a *AnimatorWidget) StartCycle(numberOfCycles int, playMode PlayMode) {
+	state := a.getState()
+	b := state.currentKeyFrame
+	state.m.Lock()
+	state.m.Unlock()
+	a.StartKeyFrames(b, b, numberOfCycles, playMode)
 }
 
 // internal start method. Stops animator if running and re-initializes it.
@@ -183,10 +187,15 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 
 	for {
 		state.m.Lock()
+		fmt.Println(state.numberOfCycles)
 		state.elapsed = 0
 		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
-			state.m.Unlock()
-			break
+			if state.numberOfCycles == 0 {
+				state.m.Unlock()
+				break
+			}
+
+			state.numberOfCycles--
 		}
 
 		state.m.Unlock()
