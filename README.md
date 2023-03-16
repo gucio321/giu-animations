@@ -135,7 +135,7 @@ const (
 )
 ```
 
-for further reference, see https://easings.net
+for further reference, see [https://easings.net](https://easings.net)
 
 ### Note about StarterFunc
 
