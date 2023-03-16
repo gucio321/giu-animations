@@ -142,9 +142,10 @@ for further reference, see [https://easings.net](https://easings.net)
 This interface holds a reference to the part of `AnimatorWidget` responsible
 for starting animations. At the moment, there are three functions
 
-- Start(PlayMode) go to the next KeyFrame (forwards or backwards)
-- StartKF(base, destination KeyFrame, mode PlayMode) go from `base` to `destination` in `mode` direction (frame by frame)
-- StartWhole(mode) - play from 0 to last Key Frame
+- `Start(PlayMode)` go to the next KeyFrame (forwards or backwards)
+- `StartCycle(numberOfCycles int, mode PlayMode)` - play animation `numberOfCycles` times starting and ending on this frame.
+- `StartKF(base, destination KeyFrame, numberOfCycles int, mode PlayMode)`
+go from `base` to `destination` in `mode` direction (frame by frame) making `numberOfCycles` cycles
 
 ### Using animator
 
