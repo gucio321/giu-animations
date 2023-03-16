@@ -1,7 +1,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/gucio321/giu-animations)](https://goreportcard.com/report/github.com/gucio321/giu-animations)
 [![GoDoc](https://pkg.go.dev/badge/github.com/gucio321/giu-animations?utm_source=godoc)](https://pkg.go.dev/mod/github.com/gucio321/giu-animations)
 
-# GIU ANIMATIONS
+<p align="center">
+<img src="./logo.png">
+</p>
 
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
 animation system.
