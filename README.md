@@ -2,6 +2,9 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/gucio321/giu-animations)](https://goreportcard.com/report/github.com/gucio321/giu-animations)
 [![GoDoc](https://pkg.go.dev/badge/github.com/gucio321/giu-animations?utm_source=godoc)](https://pkg.go.dev/mod/github.com/gucio321/giu-animations)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/gucio321/giu-animations?label=Requires%3A%20GO)](https://go.dev)
+![Unstable release](https://img.shields.io/github/v/release/gucio321/giu-animations?color=purple&include_prereleases&label=Unstable%20release)
+![Stable release](https://img.shields.io/github/v/release/gucio321/giu-animations?color=%23007b4d&label=Stable%20release)
 
 <h1 align="center">GIU Animations</h1>
 <p align="center">
