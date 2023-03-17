@@ -19,7 +19,7 @@ animation system.
 <table>
 <tr>
   <td align="center"><a href="https://github.com/sponsors/gucio321"><img src="https://github.com/gucio321.png" width="100px;" alt=""/><br /><sub><b>@gucio321</b><br>Head Developer</sub></a></td>
-  <td align="center"><a href="https://instagram.com/sirthunderek5"><img src="https://github.com/sirthunderek.png" width="100px;" alt=""/><br /><sub><b>@sirthunderek</b><br>Logo design</sub></a></td>
+  <td align="center"><a href="https://instagram.com/sirthunderek5"><img src="https://github.com/sirthunderek.png" width="100px;" alt=""/><br /><sub><b>@sirthunderek</b><br>Logo Designer</sub></a></td>
   <td align="center"><a href="https://github.com/garnn"><img src="https://github.com/garnn.png" width="100px;" alt=""/><br /><sub><b>@Garnn</b><br>Editor</sub></a></td>
 </tr>
 </table>
