@@ -8,7 +8,7 @@ import (
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
 
-	animations "github.com/gucio321/giu-animations"
+	animations "github.com/gucio321/giu-animations/v2"
 )
 
 var (

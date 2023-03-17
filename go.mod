@@ -1,4 +1,4 @@
-module github.com/gucio321/giu-animations
+module github.com/gucio321/giu-animations/v2
 
 go 1.19
 
