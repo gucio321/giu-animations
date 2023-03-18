@@ -4,7 +4,7 @@
 [![GoDoc](https://pkg.go.dev/badge/github.com/gucio321/giu-animations/v2?utm_source=godoc)](https://pkg.go.dev/mod/github.com/gucio321/giu-animations/v2)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/gucio321/giu-animations?label=Requires%3A%20GO)](https://go.dev)
 ![Unstable release](https://img.shields.io/github/v/release/gucio321/giu-animations?color=purple&include_prereleases&label=Unstable%20release)
-![Stable release](https://img.shields.io/github/v/release/gucio321/giu-animations?color=%23007b4d&label=Stable%20release)
+[![Stable release](https://img.shields.io/github/v/release/gucio321/giu-animations?color=%23007b4d&label=Stable%20release)](https://github.com/gucio321/giu-animations/releases/latest)
 
 <h1 align="center">GIU Animations</h1>
 <p align="center">
