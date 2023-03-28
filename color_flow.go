@@ -48,6 +48,7 @@ func ColorFlowColors(
 		i := i
 		c[i] = func() color.RGBA {
 			r, g, b, a := colors[i].RGBA()
+
 			return color.RGBA{
 				R: byte(r),
 				G: byte(g),

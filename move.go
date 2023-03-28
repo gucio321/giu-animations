@@ -7,36 +7,6 @@ import (
 	"github.com/AllenDang/imgui-go"
 )
 
-var _ giu.Disposable = &moveAnimationState{}
-
-type moveAnimationState struct {
-	startPos imgui.Vec2
-}
-
-// Dispose implements giu.Disposable.
-func (m *moveAnimationState) Dispose() {
-	// noop
-}
-
-func (m *MoveAnimation) getState() *moveAnimationState {
-	if s := giu.Context.GetState(m.id); s != nil {
-		state, ok := s.(*moveAnimationState)
-		if !ok {
-			log.Panicf("error asserting type of move animation state: got %T, wanted *moveAnimationState", s)
-		}
-
-		return state
-	}
-
-	giu.Context.SetState(m.id, m.newState())
-
-	return m.getState()
-}
-
-func (m *MoveAnimation) newState() *moveAnimationState {
-	return &moveAnimationState{}
-}
-
 var _ Animation = &MoveAnimation{}
 
 // MoveAnimation moves animation widget from start position to destination.
@@ -71,9 +41,7 @@ func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveSte
 // DefaultStartPos will set animation default value of MoveStep as animation starting step.
 // NOTE: You will lose possibility of setting up any additional properties of MoveStep (like bezier points).
 func (m *MoveAnimation) DefaultStartPos() *MoveAnimation {
-	return m.StartPos(func(p imgui.Vec2) *MoveStep {
-		return StepVec(p)
-	})
+	return m.StartPos(StepVec)
 }
 
 // Init implements Animation.
@@ -112,13 +80,17 @@ func (m *MoveAnimation) BuildAnimation(
 ) {
 	startPos := m.getPosition(srcFrame)
 	destPos := m.getPosition(destFrame)
+
 	var pos imgui.Vec2
 
 	steps := m.getSteps()
 
 	// srcStep depends on animations play mode
-	var srcStep *MoveStep
-	var srcPos imgui.Vec2
+	var (
+		srcStep *MoveStep
+		srcPos  imgui.Vec2
+	)
+
 	switch mode {
 	case PlayForward:
 		srcStep = steps[srcFrame]
@@ -127,11 +99,14 @@ func (m *MoveAnimation) BuildAnimation(
 		srcStep = steps[destFrame]
 		srcPos = m.getPosition(destFrame)
 	}
+
 	if srcStep.useBezier {
 		pts := []imgui.Vec2{startPos}
 		l := len(srcStep.bezier)
+
 		for i := 0; i < l; i++ {
 			var b imgui.Vec2
+
 			switch mode {
 			case PlayForward:
 				b = srcStep.bezier[i]
@@ -166,6 +141,7 @@ func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 	}
 
 	pos := imgui.Vec2{}
+
 	for i := int(currentKF); i >= 0; i-- {
 		s := steps[i]
 
@@ -183,9 +159,40 @@ func (m *MoveAnimation) getPosition(currentKF KeyFrame) imgui.Vec2 {
 func (m *MoveAnimation) getSteps() []*MoveStep {
 	state := m.getState()
 	steps := m.steps
+
 	if m.startStep != nil {
 		steps = append([]*MoveStep{m.startStep(state.startPos)}, m.steps...)
 	}
 
 	return steps
+}
+
+func (m *MoveAnimation) getState() *moveAnimationState {
+	if s := giu.Context.GetState(m.id); s != nil {
+		state, ok := s.(*moveAnimationState)
+		if !ok {
+			log.Panicf("error asserting type of move animation state: got %T, wanted *moveAnimationState", s)
+		}
+
+		return state
+	}
+
+	giu.Context.SetState(m.id, m.newState())
+
+	return m.getState()
+}
+
+func (m *MoveAnimation) newState() *moveAnimationState {
+	return &moveAnimationState{}
+}
+
+var _ giu.Disposable = &moveAnimationState{}
+
+type moveAnimationState struct {
+	startPos imgui.Vec2
+}
+
+// Dispose implements giu.Disposable.
+func (m *moveAnimationState) Dispose() {
+	// noop
 }

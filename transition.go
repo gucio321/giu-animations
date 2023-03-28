@@ -48,9 +48,11 @@ func (t *TransitionAnimation) BuildAnimation(
 ) {
 	layout1 := t.renderers[bf]
 	layout2 := t.renderers[df]
+
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, percentage)
 	layout2(starter)
 	imgui.PopStyleVar()
+
 	imgui.PushStyleVarFloat(imgui.StyleVarAlpha, 1-percentage)
 	layout1(starter)
 	imgui.PopStyleVar()

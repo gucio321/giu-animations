@@ -65,7 +65,7 @@ func Animator(a Animation) *AnimatorWidget {
 // It may be really important when using TransitionAnimation, because
 // sometimes when using sub-animators inside of Transition, it may happen
 // that the second AnimatorWidget will receive the same ID as the previous one.
-// It may cause unexpected behaviours.
+// It may cause unexpected behaviors.
 func (a *AnimatorWidget) ID(newID string) *AnimatorWidget {
 	a.id = newID
 
@@ -113,7 +113,9 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	state.m.Lock()
 	cf := state.currentKeyFrame
 	state.m.Unlock()
+
 	delta := 1
+
 	if playMode == PlayBackward {
 		delta = -1
 	}
@@ -126,9 +128,11 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 // specified by playMode.
 func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, cyclesCount int, playMode PlayMode) {
 	state := a.getState()
+
 	state.m.Lock()
 	state.currentKeyFrame = beginKF
 	state.longTimeDestinationKeyFrame = destinationKF
+
 	switch playMode {
 	case PlayForward:
 		state.destinationKeyFrame = getWithDelta(beginKF, a.numKeyFrames, 1)
@@ -143,12 +147,10 @@ func (a *AnimatorWidget) StartKeyFrames(beginKF, destinationKF KeyFrame, cyclesC
 	a.start(playMode)
 }
 
-// StartCycle plays an animation from start to end (optionally from end to start)
+// StartCycle plays an animation from start to end (optionally from end to start).
 func (a *AnimatorWidget) StartCycle(numberOfCycles int, playMode PlayMode) {
 	state := a.getState()
 	b := state.currentKeyFrame
-	state.m.Lock()
-	state.m.Unlock()
 	a.StartKeyFrames(b, b, numberOfCycles, playMode)
 }
 
@@ -176,7 +178,7 @@ func (a *AnimatorWidget) start(playMode PlayMode) {
 
 // playAnimation is where the animation is plaid.
 // It runs a for loop through all the frames that it should go.
-// It will exit if any message received on state.reset
+// It will exit if any message received on state.reset.
 func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	state := a.getState()
 	state.m.Lock()
@@ -187,6 +189,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 	for {
 		state.m.Lock()
 		state.elapsed = 0
+
 		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
 			if state.numberOfCycles == 0 {
 				state.m.Unlock()
@@ -242,6 +245,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 // Build implements giu.Widget.
 func (a *AnimatorWidget) Build() {
 	s := a.getState()
+
 	if a.shouldInit() {
 		a.animation.Init()
 		s.m.Lock()
@@ -270,6 +274,7 @@ func (a *AnimatorWidget) Build() {
 
 	if a.triggerFunc != nil {
 		triggerValue := a.triggerFunc()
+
 		switch a.triggerType {
 		case TriggerNever:
 			// noop

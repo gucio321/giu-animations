@@ -5,12 +5,14 @@ import (
 	"math"
 )
 
+// EasingAlgorithm describes what exactly an Easing Function is.
 type EasingAlgorithm func(plainPercentage float32) (percentage float32)
 
 // EasingAlgorithmType represents animation type of easing algorithm used for animation.
 // Refer https://easings.net/
 type EasingAlgorithmType byte
 
+// Easing Algorithm types.
 const (
 	EasingAlgNone EasingAlgorithmType = iota
 	EasingAlgInSine
@@ -62,6 +64,7 @@ func Ease(alg EasingAlgorithmType, t float32) float32 {
 	}
 
 	log.Panicf("Unknown easing type %v", alg)
+
 	return -1 // unreachable
 }
 
@@ -84,17 +87,21 @@ func easingAlgInBack(p float32) float32 {
 
 func easingAlgOutBack(p float32) float32 {
 	s := float32(1.70158)
-	p -= 1
+	p--
+
 	return p*p*((s+1)*p+s) + 1
 }
 
 func easingAlgInOutBack(p float32) float32 {
 	s := float32(1.70158) * 1.525
 	p *= 2
+
 	if p < 1 {
 		return 0.5 * (p * p * ((s+1)*p - s))
 	}
+
 	p -= 2
+
 	return 0.5 * (p*p*((s+1)*p+s) + 2)
 }
 
@@ -120,6 +127,7 @@ func easingAlgOutElastic(p float32) float32 {
 
 func easingAlgInOutElastic(p float32) float32 {
 	c5 := (2 * math.Pi) / 4.5
+
 	switch {
 	case p == 0:
 		return 0
@@ -129,9 +137,9 @@ func easingAlgInOutElastic(p float32) float32 {
 		return float32((math.Pow(2, -20*float64(p)+10)*math.Sin((20*float64(p)-11.125)*c5))/2) + 1
 	case p == 1:
 		return 1
-	default:
-		return 0
 	}
+
+	return 0
 }
 
 func easingAlgInBounce(p float32) float32 {
@@ -139,21 +147,25 @@ func easingAlgInBounce(p float32) float32 {
 }
 
 func easingAlgOutBounce(p float32) float32 {
-	const n1 = 7.5625
-	const d1 = 2.75
+	const (
+		n1 = 7.5625
+		d1 = 2.75
+	)
 
-	if p < 1/d1 {
+	switch {
+	case p < 1/d1:
 		return n1 * p * p
-	} else if p < 2/d1 {
+	case p < 2/d1:
 		p -= 1.5 / d1
 		return n1*p*p + 0.75
-	} else if p < 2.5/d1 {
+	case p < 2.5/d1:
 		p -= 2.25 / d1
 		return n1*p*p + 0.9375
-	} else {
-		p -= 2.625 / d1
-		return n1*p*p + 0.984375
 	}
+
+	p -= 2.625 / d1
+
+	return n1*p*p + 0.984375
 }
 
 func easingAlgInOutBounce(p float32) float32 {

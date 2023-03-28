@@ -64,8 +64,10 @@ func (a *AnimatorWidget) getState() *animatorState {
 // IsRunning returns true if the animation is already running.
 func (a *AnimatorWidget) IsRunning() bool {
 	s := a.getState()
+
 	s.m.Lock()
 	defer s.m.Unlock()
+
 	return s.isRunning
 }
 
