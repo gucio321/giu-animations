@@ -7,17 +7,20 @@ on:
       - master
       - main
   pull_request:
-
+permissions:
+  contents: read
+  # Optional: allow read access to pull request. Use with `only-new-issues` option.
+  # pull-requests: read
 jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go environment
-        uses: actions/setup-go@v2.1.3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.19
-      - uses: actions/checkout@v2
+          go-version: '1.17'
+          cache: false
+      - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.4.0
         with:
@@ -33,8 +36,9 @@ jobs:
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true
 
-          # Optional: if set to true then the action will use pre-installed Go.
-          # skip-go-installation: true
+          # Optional: if set to true then the all caching functionality will be complete disabled,
+          #           takes precedence over all other caching options.
+          # skip-cache: true
 
           # Optional: if set to true then the action don't cache or restore ~/go/pkg.
           # skip-pkg-cache: true
