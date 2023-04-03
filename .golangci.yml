@@ -55,7 +55,6 @@ linters:
     - gofumpt
     - goheader
     - goimports
-    - gomnd
     - goprintffuncname
     - gosec
     - gosimple

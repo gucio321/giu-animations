@@ -177,7 +177,7 @@ func easingAlgInOutCubic(p float32) float32 {
 	return float32(1 - math.Pow(float64(-2*p+2), 3)/2)
 }
 
-// - quart
+// - quart.
 func easingAlgInQuart(p float32) float32 {
 	return p * p * p * p
 }
@@ -264,19 +264,22 @@ func easingAlgInOutCirc(p float32) float32 {
 // - back
 
 func easingAlgInBack(p float32) float32 {
-	s := float32(1.70158)
+	const s = float32(1.70158)
+
 	return p * p * ((s+1)*p - s)
 }
 
 func easingAlgOutBack(p float32) float32 {
-	s := float32(1.70158)
+	const s = float32(1.70158)
+
 	p--
 
 	return p*p*((s+1)*p+s) + 1
 }
 
 func easingAlgInOutBack(p float32) float32 {
-	s := float32(1.70158) * 1.525
+	const s = float32(1.70158) * 1.525
+
 	p *= 2
 
 	if p < 1 {
@@ -344,9 +347,11 @@ func easingAlgOutBounce(p float32) float32 {
 		return n1 * p * p
 	case p < 2/d1:
 		p -= 1.5 / d1
+
 		return n1*p*p + 0.75
 	case p < 2.5/d1:
 		p -= 2.25 / d1
+
 		return n1*p*p + 0.9375
 	}
 

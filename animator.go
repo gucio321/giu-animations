@@ -193,6 +193,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 		if state.currentKeyFrame == state.longTimeDestinationKeyFrame {
 			if state.numberOfCycles == 0 {
 				state.m.Unlock()
+
 				break
 			}
 
@@ -202,13 +203,16 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 		state.m.Unlock()
 
 		tickDuration := time.Second / time.Duration(a.fps)
+		ticker := time.NewTicker(tickDuration)
 	AnimationLoop:
 		for {
 			select {
-			case <-time.Tick(tickDuration):
+			case <-ticker.C:
 				giu.Update()
 				state.m.Lock()
 				if state.elapsed >= state.duration {
+					ticker.Stop()
+
 					state.elapsed = 0
 
 					// call update last time to build animation normally at least once (before Power Saving Mechanism freezes updating)

@@ -35,6 +35,7 @@ func Move(w func(starter StarterFunc) giu.Widget, steps ...*MoveStep) *MoveAnima
 // argument function will receive cursor position returned by imgui.GetCursorPos while initializing animation.
 func (m *MoveAnimation) StartPos(startPosStep func(startPos imgui.Vec2) *MoveStep) *MoveAnimation {
 	m.startStep = startPosStep
+
 	return m
 }
 
