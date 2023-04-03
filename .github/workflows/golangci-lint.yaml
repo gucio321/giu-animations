@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: download GO dependencies
+        run: go get -v -d ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
         with:
