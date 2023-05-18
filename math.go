@@ -17,6 +17,7 @@ func factorial(n int) int {
 // refer: http://zobaczycmatematyke.krk.pl/025-Zolkos-Krakow/bezier.html
 func bezier(t float32, points []imgui.Vec2) imgui.Vec2 {
 	var result imgui.Vec2
+
 	for i := 0; i < len(points); i++ {
 		d := float32(factorial(len(points)-1)) /
 			float32(factorial(i)*factorial(len(points)-1-i)) *

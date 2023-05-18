@@ -123,19 +123,49 @@ These are some additional ways of controlling the flow of animation:
 
 ```go
 const (
-        EasingAlgNone EasingAlgorithmType = iota
-        EasingAlgInSine
-        EasingAlgOutSine
-        EasingAlgInOutSine
-        EasingAlgInBack
-        EasingAlgOutBack
-        EasingAlgInOutBack
-        EasingAlgInElastic
-        EasingAlgOutElastic
-        EasingAlgInOutElastic
-        EasingAlgInBounce
-        EasingAlgOutBounce
-        EasingAlgInOutBounce
+	EasingAlgNone EasingAlgorithmType = iota
+
+	EasingAlgInSine
+	EasingAlgOutSine
+	EasingAlgInOutSine
+
+	EasingAlgInQuad
+	EasingAlgOutQuad
+	EasingAlgInOutQuad
+
+	EasingAlgInCubic
+	EasingAlgOutCubic
+	EasingAlgInOutCubic
+
+	EasingAlgInQuart
+	EasingAlgOutQuart
+	EasingAlgInOutQuart
+
+	EasingAlgInQuint
+	EasingAlgOutQuint
+	EasingAlgInOutQuint
+
+	EasingAlgInExpo
+	EasingAlgOutExpo
+	EasingAlgInOutExpo
+
+	EasingAlgInCirc
+	EasingAlgOutCirc
+	EasingAlgInOutCirc
+
+	EasingAlgInBack
+	EasingAlgOutBack
+	EasingAlgInOutBack
+
+	EasingAlgInElastic
+	EasingAlgOutElastic
+	EasingAlgInOutElastic
+
+	EasingAlgInBounce
+	EasingAlgOutBounce
+	EasingAlgInOutBounce
+
+	EasingAlgMax
 )
 ```
 

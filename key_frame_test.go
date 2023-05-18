@@ -8,6 +8,7 @@ func Test_getWithDelta(t *testing.T) {
 		count   int
 		delta   int
 	}
+
 	tests := []struct {
 		name string
 		args args
