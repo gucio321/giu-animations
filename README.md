@@ -46,6 +46,7 @@ At the moment, there are three implementations of animations:
 - [Color Flow](#color-flow) - you can apply this animation to any widget
   You can configure this animation to make your button hover smoothly or change it into a rainbow!
 - [Movement](#move) - moves DrawCursor, emulating moving an object (aka `giu.Widget`).
+- [Resize](#resize) - resize a widget.
 
 Lets shortly discuss particular types of animations:
 
@@ -116,6 +117,23 @@ there are two additional methods of `MoveAnimation`.
   `Animator`.
 - another method is tu simply call `DefaultStartPos` method. It takes no arguments and acts
   like most users would like to use `StartPos` - it returns `Step(startPos)`.
+
+#### Resize
+
+```go
+func Resize[T giu.Widget](
+    w resizable2D[T],
+    sizes ...imgui.Vec2,
+) *ResizeAnimation[T] {...}
+```
+
+This will resize `w`.
+
+It is the first animation that requires a [Type Parameter](https://go.dev/tour/generics/1).
+It is because first of arguments - a widget `w` needs to implement one extra method - 
+the `Size(w, h float32)`.
+
+Second argument is a list of sizes to apply as Key Frames.
 
 ### Easing
 
