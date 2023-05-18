@@ -130,7 +130,7 @@ func Resize[T giu.Widget](
 This will resize `w`.
 
 It is the first animation that requires a [Type Parameter](https://go.dev/tour/generics/1).
-It is because first of arguments - a widget `w` needs to implement one extra method - 
+It is because first of arguments - a widget `w` needs to implement one extra method -
 the `Size(w, h float32)`.
 
 Second argument is a list of sizes to apply as Key Frames.
