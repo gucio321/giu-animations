@@ -90,9 +90,12 @@ func loop() {
 						}),
 					animations.Animator(animations.Resize[*giu.ButtonWidget](
 						giu.Button("Resize me!"),
-						imgui.Vec2{200, 200},
-						imgui.Vec2{250, 250},
-					)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
+						imgui.Vec2{X: 150, Y: 150},
+						imgui.Vec2{200, 200}, //nolint:govet
+						imgui.Vec2{250, 250}, //nolint:govet
+						imgui.Vec2{X: 300, Y: 300},
+					)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
+						EasingAlgorithm(animations.EasingAlgOutBounce),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
