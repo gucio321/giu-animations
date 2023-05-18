@@ -5,12 +5,15 @@ import (
 	"github.com/AllenDang/imgui-go"
 )
 
+// ResizeAnimation allows to resize an UI element.
 type ResizeAnimation[T giu.Widget] struct {
 	widget resizable2D[T]
 	sizes  []imgui.Vec2
 	id     string
 }
 
+// Resize creates ResizeAnimation.
+// It requires Widget type parameter (e.g. *giu.ButtonWidget).
 func Resize[T giu.Widget](w resizable2D[T], sizes ...imgui.Vec2) *ResizeAnimation[T] {
 	return &ResizeAnimation[T]{
 		id:     giu.GenAutoID("giu-animations-ResizeAnimation"),
@@ -25,19 +28,21 @@ func (r *ResizeAnimation[T]) ID(id string) {
 }
 
 // Init implements Animation interface.
-// Call this if you need to re-set animation for widget in a new place.
 func (r *ResizeAnimation[T]) Init() {
 	// noop
 }
 
+// Reset implements Animation.
 func (r *ResizeAnimation[T]) Reset() {
 	// noop
 }
 
+// KeyFramesCount implements Animation.
 func (r *ResizeAnimation[T]) KeyFramesCount() int {
 	return len(r.sizes)
 }
 
+// BuildNormal implements Animation.
 func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
 	c := imgui.CursorPos()
 	imgui.SetCursorPos(imgui.Vec2{
@@ -48,7 +53,12 @@ func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
 }
 
-func (r *ResizeAnimation[T]) BuildAnimation(animationPercentage, _ float32, baseKeyFrame, destinationKeyFrame KeyFrame, _ PlayMode, _ StarterFunc) {
+// BuildAnimation implements Animation.
+func (r *ResizeAnimation[T]) BuildAnimation(
+	animationPercentage, _ float32,
+	baseKeyFrame, destinationKeyFrame KeyFrame,
+	_ PlayMode, _ StarterFunc,
+) {
 	delta := imgui.Vec2{
 		X: (r.sizes[destinationKeyFrame].X - r.sizes[baseKeyFrame].X) * animationPercentage,
 		Y: (r.sizes[destinationKeyFrame].Y - r.sizes[baseKeyFrame].Y) * animationPercentage,
