@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	easingAlg   = animations.EasingAlgNone
-	playOnHover bool
+	easingAlg     = animations.EasingAlgNone
+	moveOnHover   bool
+	resizeOnHover bool
 )
 
 func loop() {
@@ -51,25 +52,32 @@ func loop() {
 							starterFunc.StartCycle(1, animations.PlayForward)
 						}),
 					),
-					giu.Checkbox("Play on hover", &playOnHover),
+					giu.Checkbox("Move on hover", &moveOnHover),
+					giu.Checkbox("Resize on hover", &resizeOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
-							return giu.Child().Layout(
-								giu.Row(
-									giu.Label("Set easing alg:"),
-									giu.SliderInt(&a, 0, int32(animations.EasingAlgMax-1)).Size(100).OnChange(func() {
-										easingAlg = animations.EasingAlgorithmType(a)
-									}),
+							return animations.Animator(animations.Resize[*giu.ChildWidget](
+								giu.Child().Layout(
+									giu.Row(
+										giu.Label("Set easing alg:"),
+										giu.SliderInt(&a, 0, int32(animations.EasingAlgMax-1)).Size(100).OnChange(func() {
+											easingAlg = animations.EasingAlgorithmType(a)
+										}),
+									),
+									giu.Row(
+										giu.Button("play backwards").OnClick(func() {
+											starter.Start(animations.PlayBackward)
+										}),
+										giu.Button("move me!").OnClick(func() {
+											starter.Start(animations.PlayForward)
+										}),
+									),
 								),
-								giu.Row(
-									giu.Button("play backwards").OnClick(func() {
-										starter.Start(animations.PlayBackward)
-									}),
-									giu.Button("move me!").OnClick(func() {
-										starter.Start(animations.PlayForward)
-									}),
-								),
-							).Size(200, 80)
+								imgui.Vec2{200, 80},
+								imgui.Vec2{250, 130},
+							)).Trigger(animations.TriggerOnChange, animations.PlayForward, func() bool {
+								return imgui.IsItemHovered() && resizeOnHover
+							})
 						},
 							animations.Step(20, 100).
 								Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
@@ -78,7 +86,7 @@ func loop() {
 						FPS(120).
 						EasingAlgorithm(easingAlg).
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, func() bool {
-							return playOnHover && giu.IsItemHovered()
+							return moveOnHover && giu.IsItemHovered()
 						}),
 					animations.Animator(animations.Resize[*giu.ButtonWidget](
 						giu.Button("Resize me!"),
