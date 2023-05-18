@@ -80,6 +80,11 @@ func loop() {
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, func() bool {
 							return playOnHover && giu.IsItemHovered()
 						}),
+					animations.Animator(animations.Resize[*giu.ButtonWidget](
+						giu.Button("Resize me!"),
+						imgui.Vec2{200, 200},
+						imgui.Vec2{250, 250},
+					)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
