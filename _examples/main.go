@@ -96,6 +96,7 @@ func loop() {
 						imgui.Vec2{X: 300, Y: 300},
 					)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
 						EasingAlgorithm(animations.EasingAlgOutBounce),
+					giu.Button("test"),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
