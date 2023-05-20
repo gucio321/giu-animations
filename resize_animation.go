@@ -9,8 +9,14 @@ type TrickCursor byte
 
 const (
 	TrickNever TrickCursor = 1 << iota
-	TrickCursorBefore
-	TrickCursorAfter
+	TrickCursorBeforeX
+	TrickCursorBeforeY
+	TrickCursorAfterX
+	TrickCursorAfterY
+
+	TrickCursorBefore = TrickCursorBeforeX | TrickCursorBeforeY
+	TrickCursorAfter  = TrickCursorAfterX | TrickCursorAfterY
+	TrickCursorAlways = TrickCursorBefore | TrickCursorAfter
 )
 
 // ResizeAnimation allows to resize an UI element.
@@ -25,9 +31,10 @@ type ResizeAnimation[T giu.Widget] struct {
 // It requires Widget type parameter (e.g. *giu.ButtonWidget).
 func Resize[T giu.Widget](w resizable2D[T], sizes ...imgui.Vec2) *ResizeAnimation[T] {
 	return &ResizeAnimation[T]{
-		id:     giu.GenAutoID("giu-animations-ResizeAnimation"),
-		widget: w,
-		sizes:  sizes,
+		id:          giu.GenAutoID("giu-animations-ResizeAnimation"),
+		widget:      w,
+		sizes:       sizes,
+		trickCursor: TrickCursorAlways,
 	}
 }
 
@@ -62,10 +69,7 @@ func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc
 
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
 
-	//imgui.SetCursorPos(imgui.Vec2{
-	//	X: 0, // This is because cursor is alreay moved to the next line TODO: what if Sameline called?
-	//Y: c.Y + r.sizes[0].Y,
-	//})
+	r.trickCursorAfter()
 }
 
 // BuildAnimation implements Animation.
@@ -83,22 +87,39 @@ func (r *ResizeAnimation[T]) BuildAnimation(
 
 	r.widget.Size(r.sizes[baseKeyFrame].X+delta.X, r.sizes[baseKeyFrame].Y+delta.Y).Build()
 
-	//imgui.SetCursorPos(imgui.Vec2{
-	//	X: 0, // This is because cursor is alreay moved to the next line TODO: what if Sameline called?
-	//Y: c.Y + r.sizes[0].Y,
-	//})
+	r.trickCursorAfter()
 }
 
 func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
-	if r.trickCursor&TrickCursorBefore == 0 {
-		return
-	}
+	move := imgui.Vec2{}
 
 	c := imgui.CursorPos()
-	imgui.SetCursorPos(imgui.Vec2{
-		X: c.X - (current.X+delta.X-r.sizes[0].X)/2,
-		Y: c.Y - (current.Y+delta.Y-r.sizes[0].Y)/2,
-	})
+
+	if r.trickCursor&TrickCursorBeforeX != 0 {
+		move.X = c.X - (current.X+delta.X-r.sizes[0].X)/2
+	}
+
+	if r.trickCursor&TrickCursorBeforeY != 0 {
+		move.Y = c.Y - (current.Y+delta.Y-r.sizes[0].Y)/2
+	}
+
+	imgui.SetCursorPos(move)
+}
+
+func (r *ResizeAnimation[T]) trickCursorAfter() {
+	move := imgui.Vec2{}
+	c := imgui.CursorPos()
+
+	if r.trickCursor&TrickCursorAfterX != 0 {
+		move.X = c.X + r.sizes[0].X
+	}
+
+	if r.trickCursor&TrickCursorAfterY != 0 {
+		move.Y = c.Y + r.sizes[0].Y
+	}
+
+	imgui.SetCursorPos(move)
+
 }
 
 type resizable2D[T giu.Widget] interface {

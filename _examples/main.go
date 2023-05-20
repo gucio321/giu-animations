@@ -94,7 +94,7 @@ func loop() {
 						imgui.Vec2{200, 200}, //nolint:govet
 						imgui.Vec2{250, 250}, //nolint:govet
 						imgui.Vec2{X: 300, Y: 300},
-					)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
+					).TrickCursor(animations.TrickCursorBefore)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
 						EasingAlgorithm(animations.EasingAlgOutBounce),
 					giu.Button("test"),
 				)
