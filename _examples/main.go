@@ -1,24 +1,50 @@
+// Package main contains an example of using giu-animations.
 package main
 
 import (
 	"time"
 
-	"golang.org/x/image/colornames"
-
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
+	"golang.org/x/image/colornames"
 
 	animations "github.com/gucio321/giu-animations/v2"
 )
 
+//nolint:gochecknoglobals // it's an example
 var (
 	easingAlg     = animations.EasingAlgNone
 	moveOnHover   bool
 	resizeOnHover bool
+	resizeFlags   = struct {
+		BeforeX,
+		BeforeY,
+		AfterX,
+		AfterY bool
+	}{true, true, false, false}
 )
 
+//nolint:funlen // it's an example
 func loop() {
 	a := int32(easingAlg)
+	resizeTrick := animations.TrickNever
+
+	if resizeFlags.BeforeX {
+		resizeTrick |= animations.TrickCursorBeforeX
+	}
+
+	if resizeFlags.BeforeY {
+		resizeTrick |= animations.TrickCursorBeforeY
+	}
+
+	if resizeFlags.AfterX {
+		resizeTrick |= animations.TrickCursorAfterX
+	}
+
+	if resizeFlags.AfterY {
+		resizeTrick |= animations.TrickCursorAfterY
+	}
+
 	animations.Animator(
 		animations.Transition(
 			func(starterFunc animations.StarterFunc) {
@@ -94,9 +120,14 @@ func loop() {
 						imgui.Vec2{X: 200, Y: 200},
 						imgui.Vec2{X: 250, Y: 250},
 						imgui.Vec2{X: 300, Y: 300},
-					).TrickCursor(animations.TrickCursorAlways)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
+					).TrickCursor(resizeTrick)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
 						EasingAlgorithm(animations.EasingAlgOutBounce),
-					giu.Button("test"),
+					giu.TreeNode("Resize flags").Layout(
+						giu.Checkbox("Before X", &resizeFlags.BeforeX),
+						giu.Checkbox("Before Y", &resizeFlags.BeforeY),
+						giu.Checkbox("After X", &resizeFlags.AfterX),
+						giu.Checkbox("After Y", &resizeFlags.AfterY),
+					),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
