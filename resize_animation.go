@@ -5,21 +5,37 @@ import (
 	"github.com/AllenDang/imgui-go"
 )
 
+// TrickCursor allows to enable special Drawing Cursor behavior.
+// If enabled, Drawing Cursor is moved before rendering ResizeAnimation.
+// It allows to reach an effect of resizing a UI element from its center.
+// NOTE: Be careful as this feature (especially TrickCursorAfterX) may break imgui.Sameline() mechanism.
+// NOTE: You can test it in _examples/main.go.
 type TrickCursor byte
 
+// These constants work as a bitmask. Feel free to use it like TrickCursorBeforeX | TrickCursorAfterY.
 const (
+	// TrickNever allows to disable TrickCursor.
 	TrickNever TrickCursor = 1 << iota
+
+	// TrickCursorBeforeX allows to move Drawing Cursor before rendering ResizeAnimation on X axis.
 	TrickCursorBeforeX
+	// TrickCursorBeforeY allows to move Drawing Cursor before rendering ResizeAnimation on Y axis.
 	TrickCursorBeforeY
+	// TrickCursorAfterX allows to move Drawing Cursor after rendering ResizeAnimation on X axis.
+	// IMPORTANT: Applying this will interfere with imgui.Sameline() mechanism.
 	TrickCursorAfterX
+	// TrickCursorAfterY allows to move Drawing Cursor after rendering ResizeAnimation on Y axis.
 	TrickCursorAfterY
 
+	// TrickCursorBefore allows to move Drawing Cursor before rendering ResizeAnimation on both axes.
 	TrickCursorBefore = TrickCursorBeforeX | TrickCursorBeforeY
-	TrickCursorAfter  = TrickCursorAfterX | TrickCursorAfterY
+	// TrickCursorAfter allows to move Drawing Cursor after rendering ResizeAnimation on both axes.
+	TrickCursorAfter = TrickCursorAfterX | TrickCursorAfterY
+	// TrickCursorAlways allows to move Drawing Cursor before and after rendering ResizeAnimation on both axes.
 	TrickCursorAlways = TrickCursorBefore | TrickCursorAfter
 )
 
-// ResizeAnimation allows to resize an UI element.
+// ResizeAnimation allows to resize a UI element.
 type ResizeAnimation[T giu.Widget] struct {
 	widget      resizable2D[T]
 	sizes       []imgui.Vec2
@@ -34,7 +50,7 @@ func Resize[T giu.Widget](w resizable2D[T], sizes ...imgui.Vec2) *ResizeAnimatio
 		id:          giu.GenAutoID("giu-animations-ResizeAnimation"),
 		widget:      w,
 		sizes:       sizes,
-		trickCursor: TrickCursorAlways,
+		trickCursor: TrickCursorBeforeY,
 	}
 }
 
@@ -43,8 +59,11 @@ func (r *ResizeAnimation[T]) ID(id string) {
 	r.id = id
 }
 
+// TrickCursor allows to set TrickCursor.
+// Default: TrickCursorBefore.
 func (r *ResizeAnimation[T]) TrickCursor(t TrickCursor) *ResizeAnimation[T] {
 	r.trickCursor = t
+
 	return r
 }
 
@@ -66,6 +85,7 @@ func (r *ResizeAnimation[T]) KeyFramesCount() int {
 // BuildNormal implements Animation.
 func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
 	cursorPosBefore := imgui.CursorPos()
+
 	r.trickCursorBefore(r.sizes[currentKeyFrame], imgui.Vec2{})
 
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
@@ -85,6 +105,7 @@ func (r *ResizeAnimation[T]) BuildAnimation(
 	}
 
 	cursorPosBefore := imgui.CursorPos()
+
 	r.trickCursorBefore(r.sizes[baseKeyFrame], delta)
 
 	r.widget.Size(r.sizes[baseKeyFrame].X+delta.X, r.sizes[baseKeyFrame].Y+delta.Y).Build()
@@ -118,7 +139,6 @@ func (r *ResizeAnimation[T]) trickCursorAfter(cursorPosBefore imgui.Vec2) {
 	}
 
 	imgui.SetCursorPos(move)
-
 }
 
 type resizable2D[T giu.Widget] interface {
