@@ -22,6 +22,7 @@ var (
 		AfterX,
 		AfterY bool
 	}{true, true, false, false}
+	sameline bool
 )
 
 //nolint:funlen // it's an example
@@ -122,11 +123,19 @@ func loop() {
 						imgui.Vec2{X: 300, Y: 300},
 					).TrickCursor(resizeTrick)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
 						EasingAlgorithm(animations.EasingAlgOutBounce),
+
+					giu.Custom(func() {
+						if sameline {
+							imgui.SameLine()
+						}
+					}),
 					giu.TreeNode("Resize flags").Layout(
 						giu.Checkbox("Before X", &resizeFlags.BeforeX),
 						giu.Checkbox("Before Y", &resizeFlags.BeforeY),
 						giu.Checkbox("After X", &resizeFlags.AfterX),
 						giu.Checkbox("After Y", &resizeFlags.AfterY),
+						giu.Separator(),
+						giu.Checkbox("Put me in the same line with resizable button", &sameline),
 					),
 				)
 			},
