@@ -84,13 +84,11 @@ func (r *ResizeAnimation[T]) KeyFramesCount() int {
 
 // BuildNormal implements Animation.
 func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
-	cursorPosBefore := imgui.CursorPos()
-
 	r.trickCursorBefore(r.sizes[currentKeyFrame], imgui.Vec2{})
 
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
 
-	r.trickCursorAfter(cursorPosBefore)
+	r.trickCursorAfter(r.sizes[currentKeyFrame])
 }
 
 // BuildAnimation implements Animation.
@@ -104,13 +102,16 @@ func (r *ResizeAnimation[T]) BuildAnimation(
 		Y: (r.sizes[destinationKeyFrame].Y - r.sizes[baseKeyFrame].Y) * animationPercentage,
 	}
 
-	cursorPosBefore := imgui.CursorPos()
-
 	r.trickCursorBefore(r.sizes[baseKeyFrame], delta)
 
-	r.widget.Size(r.sizes[baseKeyFrame].X+delta.X, r.sizes[baseKeyFrame].Y+delta.Y).Build()
+	newSize := imgui.Vec2{
+		X: r.sizes[baseKeyFrame].X + delta.X,
+		Y: r.sizes[baseKeyFrame].Y + delta.Y,
+	}
 
-	r.trickCursorAfter(cursorPosBefore)
+	r.widget.Size(newSize.X, newSize.Y).Build()
+
+	r.trickCursorAfter(newSize)
 }
 
 func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
@@ -127,15 +128,15 @@ func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
 	imgui.SetCursorPos(move)
 }
 
-func (r *ResizeAnimation[T]) trickCursorAfter(cursorPosBefore imgui.Vec2) {
+func (r *ResizeAnimation[T]) trickCursorAfter(currentSize imgui.Vec2) {
 	move := imgui.CursorPos()
 
 	if r.trickCursor&TrickCursorAfterX != 0 {
-		move.X = cursorPosBefore.X + r.sizes[0].X
+		move.X -= (currentSize.X - r.sizes[0].X) / 2
 	}
 
 	if r.trickCursor&TrickCursorAfterY != 0 {
-		move.Y = cursorPosBefore.Y + r.sizes[0].Y
+		move.Y -= (currentSize.Y - r.sizes[0].Y) / 2
 	}
 
 	imgui.SetCursorPos(move)
