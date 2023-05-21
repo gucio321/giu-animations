@@ -73,9 +73,9 @@ func loop() {
 										}),
 									),
 								),
-								imgui.Vec2{200, 80},
-								imgui.Vec2{250, 130},
-							)).Trigger(animations.TriggerOnChange, animations.PlayForward, func() bool {
+								imgui.Vec2{X: 200, Y: 80},
+								imgui.Vec2{X: 250, Y: 130},
+							).TrickCursor(animations.TrickNever)).Trigger(animations.TriggerOnChange, animations.PlayForward, func() bool {
 								return imgui.IsItemHovered() && resizeOnHover
 							})
 						},
@@ -91,10 +91,10 @@ func loop() {
 					animations.Animator(animations.Resize[*giu.ButtonWidget](
 						giu.Button("Resize me!"),
 						imgui.Vec2{X: 150, Y: 150},
-						imgui.Vec2{200, 200}, //nolint:govet
-						imgui.Vec2{250, 250}, //nolint:govet
+						imgui.Vec2{X: 200, Y: 200},
+						imgui.Vec2{X: 250, Y: 250},
 						imgui.Vec2{X: 300, Y: 300},
-					).TrickCursor(animations.TrickCursorBefore)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
+					).TrickCursor(animations.TrickCursorAlways)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
 						EasingAlgorithm(animations.EasingAlgOutBounce),
 					giu.Button("test"),
 				)
