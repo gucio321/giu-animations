@@ -84,6 +84,13 @@ func (r *ResizeAnimation[T]) KeyFramesCount() int {
 
 // BuildNormal implements Animation.
 func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
+	// This may happen if user forgot to pass size vectors. In this case just allow to build unchanged widget.
+	if int(currentKeyFrame) > len(r.sizes)-1 {
+		r.widget.Build()
+
+		return
+	}
+
 	r.trickCursorBefore(r.sizes[currentKeyFrame], imgui.Vec2{})
 
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
