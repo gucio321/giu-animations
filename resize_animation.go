@@ -133,6 +133,7 @@ func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
 		move.Y -= (current.Y + delta.Y - r.sizes[0].Y) / 2
 	}
 
+	imgui.Sameline()
 	imgui.Dummy(move)
 }
 
