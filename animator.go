@@ -274,10 +274,17 @@ func (a *AnimatorWidget) Build() {
 		return
 	}
 
-	a.animation.BuildNormal(cf, a)
+	wasCalled := false
+	triggerValue := false
+	a.animation.BuildNormal(cf, a, func() {
+		wasCalled = true
+		triggerValue = triggerValue || a.triggerFunc()
+	})
 
 	if a.triggerFunc != nil {
-		triggerValue := a.triggerFunc()
+		if !wasCalled {
+			triggerValue = a.triggerFunc()
+		}
 
 		switch a.triggerType {
 		case TriggerNever:

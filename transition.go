@@ -35,7 +35,7 @@ func (t *TransitionAnimation) Init() {
 }
 
 // BuildNormal implements Animation interface.
-func (t *TransitionAnimation) BuildNormal(f KeyFrame, starter StarterFunc) {
+func (t *TransitionAnimation) BuildNormal(f KeyFrame, starter StarterFunc, _ func()) {
 	t.renderers[f](starter)
 }
 

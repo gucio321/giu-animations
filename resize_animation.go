@@ -83,7 +83,7 @@ func (r *ResizeAnimation[T]) KeyFramesCount() int {
 }
 
 // BuildNormal implements Animation.
-func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
+func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc, triggerCheck func()) {
 	// This may happen if user forgot to pass size vectors. In this case just allow to build unchanged widget.
 	if int(currentKeyFrame) > len(r.sizes)-1 {
 		r.widget.Build()
@@ -94,6 +94,7 @@ func (r *ResizeAnimation[T]) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc
 	r.trickCursorBefore(r.sizes[currentKeyFrame], imgui.Vec2{})
 
 	r.widget.Size(r.sizes[currentKeyFrame].X, r.sizes[currentKeyFrame].Y).Build()
+	triggerCheck()
 
 	r.trickCursorAfter(r.sizes[currentKeyFrame])
 }
@@ -122,7 +123,7 @@ func (r *ResizeAnimation[T]) BuildAnimation(
 }
 
 func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
-	move := imgui.CursorPos()
+	move := imgui.Vec2{}
 
 	if r.trickCursor&TrickCursorBeforeX != 0 {
 		move.X -= (current.X + delta.X - r.sizes[0].X) / 2
@@ -132,11 +133,11 @@ func (r *ResizeAnimation[T]) trickCursorBefore(current, delta imgui.Vec2) {
 		move.Y -= (current.Y + delta.Y - r.sizes[0].Y) / 2
 	}
 
-	imgui.SetCursorPos(move)
+	imgui.Dummy(move)
 }
 
 func (r *ResizeAnimation[T]) trickCursorAfter(currentSize imgui.Vec2) {
-	move := imgui.CursorPos()
+	move := imgui.Vec2{}
 
 	if r.trickCursor&TrickCursorAfterX != 0 {
 		move.X -= (currentSize.X - r.sizes[0].X) / 2
@@ -146,7 +147,7 @@ func (r *ResizeAnimation[T]) trickCursorAfter(currentSize imgui.Vec2) {
 		move.Y -= (currentSize.Y - r.sizes[0].Y) / 2
 	}
 
-	imgui.SetCursorPos(move)
+	imgui.Dummy(move)
 }
 
 type resizable2D[T giu.Widget] interface {
