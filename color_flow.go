@@ -91,7 +91,7 @@ func (c *ColorFlowAnimation) KeyFramesCount() int {
 }
 
 // BuildNormal builds animation in normal, not-triggered state.
-func (c *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc) {
+func (c *ColorFlowAnimation) BuildNormal(currentKeyFrame KeyFrame, _ StarterFunc, _ func()) {
 	normalColor := c.color[currentKeyFrame]()
 
 	c.build(normalColor)

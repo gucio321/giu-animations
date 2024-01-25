@@ -66,7 +66,7 @@ func (m *MoveAnimation) KeyFramesCount() int {
 }
 
 // BuildNormal implements Animation.
-func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc) {
+func (m *MoveAnimation) BuildNormal(currentKF KeyFrame, starter StarterFunc, _ func()) {
 	imgui.SetCursorPos(m.getPosition(currentKF))
 
 	m.widget(starter).Build()

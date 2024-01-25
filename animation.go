@@ -15,7 +15,9 @@ type Animation interface {
 
 	// BuildNormal is called every frame when animation is not running
 	// starter is animation link to Animator.Start
-	BuildNormal(currentKeyFrame KeyFrame, starterFunc StarterFunc)
+	// triggerCheck should be placed where the animator should check for trigger. If not called - Animator will do that
+	// after rendering the widget (after calling BuildNormal).
+	BuildNormal(currentKeyFrame KeyFrame, starterFunc StarterFunc, triggerCheck func())
 	// BuildAnimation is called when running an animation.
 	// It receives several important arguments:
 	// - animationPercentage after applying specified by Animator

@@ -1,23 +1,51 @@
+// Package main contains an example of using giu-animations.
 package main
 
 import (
 	"time"
 
-	"golang.org/x/image/colornames"
-
 	"github.com/AllenDang/giu"
 	"github.com/AllenDang/imgui-go"
+	"golang.org/x/image/colornames"
 
 	animations "github.com/gucio321/giu-animations/v2"
 )
 
+//nolint:gochecknoglobals // it's an example
 var (
-	easingAlg   = animations.EasingAlgNone
-	playOnHover bool
+	easingAlg     = animations.EasingAlgNone
+	moveOnHover   bool
+	resizeOnHover bool
+	resizeFlags   = struct {
+		BeforeX,
+		BeforeY,
+		AfterX,
+		AfterY bool
+	}{true, true, false, false}
+	sameline bool
 )
 
+//nolint:funlen // it's an example
 func loop() {
 	a := int32(easingAlg)
+	resizeTrick := animations.TrickNever
+
+	if resizeFlags.BeforeX {
+		resizeTrick |= animations.TrickCursorBeforeX
+	}
+
+	if resizeFlags.BeforeY {
+		resizeTrick |= animations.TrickCursorBeforeY
+	}
+
+	if resizeFlags.AfterX {
+		resizeTrick |= animations.TrickCursorAfterX
+	}
+
+	if resizeFlags.AfterY {
+		resizeTrick |= animations.TrickCursorAfterY
+	}
+
 	animations.Animator(
 		animations.Transition(
 			func(starterFunc animations.StarterFunc) {
@@ -51,25 +79,32 @@ func loop() {
 							starterFunc.StartCycle(1, animations.PlayForward)
 						}),
 					),
-					giu.Checkbox("Play on hover", &playOnHover),
+					giu.Checkbox("Move on hover", &moveOnHover),
+					giu.Checkbox("Resize on hover", &resizeOnHover),
 					animations.Animator(
 						animations.Move(func(starter animations.StarterFunc) giu.Widget {
-							return giu.Child().Layout(
-								giu.Row(
-									giu.Label("Set easing alg:"),
-									giu.SliderInt(&a, 0, int32(animations.EasingAlgMax-1)).Size(100).OnChange(func() {
-										easingAlg = animations.EasingAlgorithmType(a)
-									}),
+							return animations.Animator(animations.Resize[*giu.ChildWidget](
+								giu.Child().Layout(
+									giu.Row(
+										giu.Label("Set easing alg:"),
+										giu.SliderInt(&a, 0, int32(animations.EasingAlgMax-1)).Size(100).OnChange(func() {
+											easingAlg = animations.EasingAlgorithmType(a)
+										}),
+									),
+									giu.Row(
+										giu.Button("play backwards").OnClick(func() {
+											starter.Start(animations.PlayBackward)
+										}),
+										giu.Button("move me!").OnClick(func() {
+											starter.Start(animations.PlayForward)
+										}),
+									),
 								),
-								giu.Row(
-									giu.Button("play backwards").OnClick(func() {
-										starter.Start(animations.PlayBackward)
-									}),
-									giu.Button("move me!").OnClick(func() {
-										starter.Start(animations.PlayForward)
-									}),
-								),
-							).Size(200, 80)
+								imgui.Vec2{X: 200, Y: 80},
+								imgui.Vec2{X: 250, Y: 130},
+							).TrickCursor(animations.TrickNever)).Trigger(animations.TriggerOnChange, animations.PlayForward, func() bool {
+								return imgui.IsItemHovered() && resizeOnHover
+							})
 						},
 							animations.Step(20, 100).
 								Bezier(imgui.Vec2{X: 20, Y: 20}, imgui.Vec2{X: 90}),
@@ -78,8 +113,30 @@ func loop() {
 						FPS(120).
 						EasingAlgorithm(easingAlg).
 						Trigger(animations.TriggerOnTrue, animations.PlayForward, func() bool {
-							return playOnHover && giu.IsItemHovered()
+							return moveOnHover && giu.IsItemHovered()
 						}),
+					animations.Animator(animations.Resize[*giu.ButtonWidget](
+						giu.Button("Resize me!"),
+						imgui.Vec2{X: 150, Y: 150},
+						imgui.Vec2{X: 200, Y: 200},
+						imgui.Vec2{X: 250, Y: 250},
+						imgui.Vec2{X: 300, Y: 300},
+					).TrickCursor(resizeTrick)).Trigger(animations.TriggerOnChange, animations.PlayForward, imgui.IsItemHovered).
+						EasingAlgorithm(animations.EasingAlgOutBounce),
+
+					giu.Custom(func() {
+						if sameline {
+							imgui.SameLine()
+						}
+					}),
+					giu.TreeNode("Resize flags").Layout(
+						giu.Checkbox("Before X", &resizeFlags.BeforeX),
+						giu.Checkbox("Before Y", &resizeFlags.BeforeY),
+						giu.Checkbox("After X", &resizeFlags.AfterX),
+						giu.Checkbox("After Y", &resizeFlags.AfterY),
+						giu.Separator(),
+						giu.Checkbox("Put me in the same line with resizable button", &sameline),
+					),
 				)
 			},
 			func(starterFunc animations.StarterFunc) {
