@@ -8,7 +8,7 @@
 
 <h1 align="center">GIU Animations</h1>
 <p align="center">
-<img src="./logo.png">
+<a href="https://gucio321.github.io/giu-animations"><img src="./logo.png"></a>
 </p>
 
 This is a module for [giu](https://github.com/AllenDang/giu) providing an
