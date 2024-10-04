@@ -1,6 +1,6 @@
 package animations
 
-import "github.com/AllenDang/imgui-go"
+import "github.com/AllenDang/cimgui-go/imgui"
 
 // MoveStep represents animation single key frame in context of MoveAnimation.
 // If Relative() not set, positionDelta is relative to this in animation previous step.

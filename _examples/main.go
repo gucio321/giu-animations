@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/image/colornames"
 
+	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/AllenDang/giu"
-	"github.com/AllenDang/imgui-go"
 
 	animations "github.com/gucio321/giu-animations/v2"
 )

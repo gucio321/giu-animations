@@ -3,7 +3,7 @@ package animations
 import (
 	"math"
 
-	"github.com/AllenDang/imgui-go"
+	"github.com/AllenDang/cimgui-go/imgui"
 )
 
 func factorial(n int) int {

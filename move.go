@@ -3,8 +3,8 @@ package animations
 import (
 	"log"
 
+	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/AllenDang/giu"
-	"github.com/AllenDang/imgui-go"
 )
 
 var _ Animation = &MoveAnimation{}
@@ -12,7 +12,7 @@ var _ Animation = &MoveAnimation{}
 // MoveAnimation moves animation widget from start position to destination.
 // You can also specify animation Bézier curve's points.
 type MoveAnimation struct {
-	id string
+	id giu.ID
 
 	widget func(starter StarterFunc) giu.Widget
 	steps  []*MoveStep

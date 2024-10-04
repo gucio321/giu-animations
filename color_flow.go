@@ -3,8 +3,8 @@ package animations
 import (
 	"image/color"
 
+	"github.com/AllenDang/cimgui-go/imgui"
 	"github.com/AllenDang/giu"
-	"github.com/AllenDang/imgui-go"
 )
 
 var _ Animation = &ColorFlowAnimation{}
@@ -12,7 +12,7 @@ var _ Animation = &ColorFlowAnimation{}
 // ColorFlowAnimation makes a smooth flow from one color to another
 // on all specified StyleColor variables.
 type ColorFlowAnimation struct {
-	id string
+	id giu.ID
 
 	giu.Widget
 	applyingStyles []giu.StyleColorID
@@ -29,10 +29,10 @@ func ColorFlowStyle(
 		widget,
 		[]giu.StyleColorID{normal, destiny},
 		func() color.RGBA {
-			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(normal)))
+			return giu.Vec4ToRGBA(*imgui.StyleColorVec4(imgui.Col(normal)))
 		},
 		func() color.RGBA {
-			return giu.Vec4ToRGBA(imgui.CurrentStyle().GetColor(imgui.StyleColorID(destiny)))
+			return giu.Vec4ToRGBA(*imgui.StyleColorVec4(imgui.Col(destiny)))
 		},
 	)
 }

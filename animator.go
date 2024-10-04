@@ -30,7 +30,7 @@ var (
 // please open an issue in source repository.
 type AnimatorWidget struct {
 	// giu ID used for storing internal state
-	id string
+	id giu.ID
 
 	// playback properties
 	duration time.Duration
@@ -66,7 +66,7 @@ func Animator(a Animation) *AnimatorWidget {
 // sometimes when using sub-animators inside of Transition, it may happen
 // that the second AnimatorWidget will receive the same ID as the previous one.
 // It may cause unexpected behaviors.
-func (a *AnimatorWidget) ID(newID string) *AnimatorWidget {
+func (a *AnimatorWidget) ID(newID giu.ID) *AnimatorWidget {
 	a.id = newID
 
 	return a

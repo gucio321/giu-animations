@@ -1,7 +1,7 @@
 package animations
 
 import (
-	"github.com/AllenDang/imgui-go"
+	"github.com/AllenDang/cimgui-go/imgui"
 )
 
 var _ Animation = &TransitionAnimation{}

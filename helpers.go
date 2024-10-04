@@ -1,6 +1,6 @@
 package animations
 
-import "github.com/AllenDang/imgui-go"
+import "github.com/AllenDang/cimgui-go/imgui"
 
 func vecSum(vec1, vec2 imgui.Vec2) imgui.Vec2 {
 	return imgui.Vec2{
