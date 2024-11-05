@@ -45,7 +45,6 @@ func ColorFlowColors(
 ) *ColorFlowAnimation {
 	c := make([]func() color.RGBA, len(colors))
 	for i := range c {
-		i := i
 		c[i] = func() color.RGBA {
 			r, g, b, a := colors[i].RGBA()
 

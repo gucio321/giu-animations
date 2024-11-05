@@ -20,12 +20,12 @@ linters-settings:
     min-complexity: 15
   goimports:
     local-prefixes: github.com/gucio321/giu-animations
-  govet:
-    check-shadowing: true
   lll:
     line-length: 140
   maligned:
     suggest-new: true
+  govet:
+    cehck-shadowing: true
   misspell:
     locale: US
 
@@ -34,12 +34,12 @@ linters:
   enable:
     - asciicheck
     - bodyclose
-    - depguard
+    - copyloopvar
     - dogsled
     - dupl
+    - err113
     - errcheck
     - errorlint
-    - exportloopref
     - forcetypeassert
     - funlen
     - gci
@@ -50,7 +50,6 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - goerr113
     - gofmt
     - gofumpt
     - goheader
@@ -87,10 +86,6 @@ linters:
 
 run:
   timeout: 5m
-  skip-dirs:
-    - .github
-    - build
-    - web
 
 issues:
   max-same-issues: 0
