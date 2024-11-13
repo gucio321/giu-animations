@@ -3,7 +3,7 @@ module github.com/gucio321/giu-animations/v2
 go 1.23.2
 
 require (
-	github.com/AllenDang/cimgui-go v1.1.0
+	github.com/AllenDang/cimgui-go v1.2.0
 	github.com/AllenDang/giu v0.10.0
 )
 
