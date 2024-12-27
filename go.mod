@@ -1,8 +1,10 @@
 module github.com/gucio321/giu-animations/v2
 
 go 1.23.2
+toolchain go1.23.4
+
 require (
-	github.com/AllenDang/cimgui-go v1.2.0
+	github.com/AllenDang/cimgui-go v1.3.0
 	github.com/AllenDang/giu v0.11.0
 )
 
