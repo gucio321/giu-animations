@@ -294,23 +294,25 @@ func easingAlgInOutBack(p float32) float32 {
 // - elastic
 
 func easingAlgInElastic(p float32) float32 {
-	if p == 0 {
+	switch p {
+	case 0:
 		return 0
-	} else if p == 1 {
+	case 1:
 		return 1
+	default:
+		return -float32(math.Pow(2, 10*float64(p)-10) * math.Sin((float64(p)*10-10.75)*(2*math.Pi)/3))
 	}
-
-	return -float32(math.Pow(2, 10*float64(p)-10) * math.Sin((float64(p)*10-10.75)*(2*math.Pi)/3))
 }
 
 func easingAlgOutElastic(p float32) float32 {
-	if p == 0 {
+	switch p {
+	case 0:
 		return 0
-	} else if p == 1 {
+	case 1:
 		return 1
+	default:
+		return float32(math.Pow(2, -10*float64(p))*math.Sin((float64(p)*10-0.75)*(2*math.Pi)/3)) + 1
 	}
-
-	return float32(math.Pow(2, -10*float64(p))*math.Sin((float64(p)*10-0.75)*(2*math.Pi)/3)) + 1
 }
 
 func easingAlgInOutElastic(p float32) float32 {

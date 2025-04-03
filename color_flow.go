@@ -123,7 +123,7 @@ func (c *ColorFlowAnimation) build(col color.Color) {
 
 	defer giu.PopStyleColorV(len(c.applyingStyles))
 
-	c.Widget.Build()
+	c.Build()
 }
 
 func clamp01(val float32) float32 {
