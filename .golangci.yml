@@ -1,36 +1,6 @@
----
-linters-settings:
-  dupl:
-    threshold: 100
-  funlen:
-    lines: 100
-    statements: 50
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-  gocyclo:
-    min-complexity: 15
-  goimports:
-    local-prefixes: github.com/gucio321/giu-animations
-  lll:
-    line-length: 140
-  maligned:
-    suggest-new: true
-  govet:
-    cehck-shadowing: true
-  misspell:
-    locale: US
-
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - asciicheck
     - bodyclose
@@ -42,21 +12,16 @@ linters:
     - errorlint
     - forcetypeassert
     - funlen
-    - gci
-    - godot
     - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - gofumpt
+    - godot
     - goheader
-    - goimports
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - importas
     - ineffassign
@@ -74,8 +39,6 @@ linters:
     - revive
     - rowserrcheck
     - staticcheck
-    - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
@@ -83,10 +46,49 @@ linters:
     - whitespace
     - wrapcheck
     - wsl
-
-run:
-  timeout: 5m
-
+  settings:
+    dupl:
+      threshold: 100
+    funlen:
+      lines: 100
+      statements: 50
+    goconst:
+      min-len: 2
+      min-occurrences: 2
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    gocyclo:
+      min-complexity: 15
+    lll:
+      line-length: 140
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-same-issues: 0
-  exclude-use-default: false
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/gucio321/giu-animations
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
