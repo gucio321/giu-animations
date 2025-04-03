@@ -1,6 +1,7 @@
 module github.com/gucio321/giu-animations/v2
 
-go 1.23.2
+go 1.24.0
+
 toolchain go1.24.1
 
 require (
