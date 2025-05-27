@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/AllenDang/cimgui-go v1.3.2-0.20250409185506-6b2ff1aa26b5
-	github.com/AllenDang/giu v0.14.0
+	github.com/AllenDang/giu v0.14.1
 )
 
 require (
