@@ -45,7 +45,7 @@ linters:
     - wastedassign
     - whitespace
     - wrapcheck
-    - wsl
+    - wsl_v5
   settings:
     dupl:
       threshold: 100
@@ -68,6 +68,11 @@ linters:
       line-length: 140
     misspell:
       locale: US
+    wsl_5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+
   exclusions:
     generated: lax
     paths:
