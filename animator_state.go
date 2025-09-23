@@ -73,6 +73,7 @@ func (a *AnimatorWidget) IsRunning() bool {
 
 func (a *AnimatorWidget) shouldInit() bool {
 	s := a.getState()
+
 	s.m.Lock()
 	defer s.m.Unlock()
 
@@ -88,6 +89,7 @@ func (a *AnimatorWidget) CurrentPercentageProgress() float32 {
 	}
 
 	s := a.getState()
+
 	s.m.Lock()
 	defer s.m.Unlock()
 

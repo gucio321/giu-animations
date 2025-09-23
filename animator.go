@@ -204,12 +204,14 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 
 		tickDuration := time.Second / time.Duration(a.fps)
 		ticker := time.NewTicker(tickDuration)
+
 	AnimationLoop:
 		for {
 			select {
 			case <-ticker.C:
 				giu.Update()
 				state.m.Lock()
+
 				if state.elapsed >= state.duration {
 					ticker.Stop()
 
