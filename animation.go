@@ -11,7 +11,7 @@ type Animation interface {
 
 	// KeyFramesCount is used mainly by the AnimatorWidget.
 	// It returns animation number of key frames.
-	KeyFramesCount() int
+	KeyFramesCount() KeyFrame
 
 	// BuildNormal is called every frame when animation is not running
 	// starter is animation link to Animator.Start

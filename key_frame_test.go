@@ -5,8 +5,8 @@ import "testing"
 func Test_getWithDelta(t *testing.T) {
 	type args struct {
 		current KeyFrame
-		count   int
-		delta   int
+		count   KeyFrame
+		delta   KeyFrame
 	}
 
 	tests := []struct {

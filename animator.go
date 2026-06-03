@@ -44,7 +44,7 @@ type AnimatorWidget struct {
 	triggerFunc    TriggerFunc
 
 	animation    Animation
-	numKeyFrames int // <- Filled in in Animator call. SHOULD NOT CHANGE after it.
+	numKeyFrames KeyFrame // <- Filled in in Animator call. SHOULD NOT CHANGE after it.
 }
 
 // Animator creates animation new AnimatorWidget.
@@ -114,7 +114,7 @@ func (a *AnimatorWidget) Start(playMode PlayMode) {
 	cf := state.currentKeyFrame
 	state.m.Unlock()
 
-	delta := 1
+	var delta KeyFrame = 1
 
 	if playMode == PlayBackward {
 		delta = -1
@@ -221,7 +221,7 @@ func (a *AnimatorWidget) playAnimation(playMode PlayMode) {
 					// This is important mainly because of triggers that might have to be run.
 					giu.Update()
 
-					delta := 1
+					var delta KeyFrame = 1
 					if playMode == PlayBackward {
 						delta = -1
 					}

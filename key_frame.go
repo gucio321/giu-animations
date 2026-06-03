@@ -1,16 +1,21 @@
 package animations
 
-import "log"
+import (
+	"log"
+	"math"
+)
 
 // KeyFrame represents the most important states of an animation.
 // Each animation declares an algorithm of calculating states between
 // its KeyFrames.
-type KeyFrame byte
+type KeyFrame int16
+
+const keyFrameMaxSize = math.MaxInt16
 
 // getWithDelta returns clamp(0, count-1, current + delta)
 // it can return a numbers of cycles to be performed
 // TODO(gucio321): I believe it could be done simpler.
-func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
+func getWithDelta(current, count, delta KeyFrame) KeyFrame {
 	// special case
 	if count == 1 && (delta == 1 || delta == -1) {
 		return 0
@@ -20,7 +25,7 @@ func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
 		log.Panicf("Unexpected delta received: %v expected at most %v", delta, count-1)
 	}
 
-	result := int(current) + delta
+	result := current + delta
 	if result < 0 {
 		result = count + result
 	}
@@ -29,5 +34,5 @@ func getWithDelta(current KeyFrame, count, delta int) KeyFrame {
 		result -= count
 	}
 
-	return KeyFrame(result)
+	return result
 }

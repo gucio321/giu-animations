@@ -20,8 +20,13 @@ func Transition(renderers ...func(starter StarterFunc)) *TransitionAnimation {
 }
 
 // KeyFramesCount implements Animation interface.
-func (t *TransitionAnimation) KeyFramesCount() int {
-	return len(t.renderers)
+func (t *TransitionAnimation) KeyFramesCount() KeyFrame {
+	result := len(t.renderers)
+	if result > keyFrameMaxSize {
+		panic("too many renderers for transition animation")
+	}
+
+	return KeyFrame(result)
 }
 
 // Reset implements Animation interface.

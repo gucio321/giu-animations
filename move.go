@@ -56,13 +56,17 @@ func (m *MoveAnimation) Reset() {
 }
 
 // KeyFramesCount implements Animation interface.
-func (m *MoveAnimation) KeyFramesCount() int {
+func (m *MoveAnimation) KeyFramesCount() KeyFrame {
 	l := len(m.steps)
 	if m.startStep != nil {
 		l++
 	}
 
-	return l
+	if l > keyFrameMaxSize {
+		panic("Too many KeyFrames")
+	}
+
+	return KeyFrame(l)
 }
 
 // BuildNormal implements Animation.

@@ -46,14 +46,10 @@ func ColorFlowColors(
 	c := make([]func() color.RGBA, len(colors))
 	for i := range c {
 		c[i] = func() color.RGBA {
-			r, g, b, a := colors[i].RGBA()
+			rgba, ok := color.RGBAModel.Convert(colors[i]).(color.RGBA)
+			giu.Assert(ok, "ColorFlowAnimation", "ColorFlowColors", "Unable to convert color to RGBA")
 
-			return color.RGBA{
-				R: byte(r),
-				G: byte(g),
-				B: byte(b),
-				A: byte(a),
-			}
+			return rgba
 		}
 	}
 
@@ -85,8 +81,13 @@ func (c *ColorFlowAnimation) Init() {
 }
 
 // KeyFramesCount implements Animation.
-func (c *ColorFlowAnimation) KeyFramesCount() int {
-	return len(c.color)
+func (c *ColorFlowAnimation) KeyFramesCount() KeyFrame {
+	result := len(c.color)
+	if result > keyFrameMaxSize {
+		panic("Too many KeyFrames")
+	}
+
+	return KeyFrame(result)
 }
 
 // BuildNormal builds animation in normal, not-triggered state.
