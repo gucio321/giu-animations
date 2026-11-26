@@ -3,7 +3,7 @@ module github.com/gucio321/giu-animations/v2
 go 1.25.0
 
 require (
-	github.com/AllenDang/cimgui-go v1.5.0
+	github.com/AllenDang/cimgui-go v1.6.1
 	github.com/AllenDang/giu v0.15.0
 )
 
@@ -18,6 +18,6 @@ require (
 	golang.design/x/hotkey v0.4.1 // indirect
 	golang.design/x/mainthread v0.3.0 // indirect
 	golang.org/x/image v0.41.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 )
